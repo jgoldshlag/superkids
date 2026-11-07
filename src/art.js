@@ -17,7 +17,7 @@ function starPoints(cx, cy, outer, inner) {
 }
 
 // A person, 48x64, seen from the front/top.
-function drawPerson(g, o) {
+export function drawPerson(g, o) {
   if (o.cape) {
     g.fillStyle(o.cape, 1);
     g.fillPoints([{ x: 13, y: 31 }, { x: 35, y: 31 }, { x: 44, y: 59 }, { x: 4, y: 59 }], true);

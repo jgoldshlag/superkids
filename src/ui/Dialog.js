@@ -1,3 +1,5 @@
+import { sfx } from '../audio/sound.js';
+
 // Talking box at the bottom of the screen. `await dialog.show(...)` waits for a tap / SPACE.
 export default class Dialog {
   constructor(scene) {
@@ -36,6 +38,7 @@ export default class Dialog {
   show(name, text, portraitKey, color = '#ffd23f') {
     return new Promise((resolve) => {
       this.c.setVisible(true);
+      sfx('talk');
       this.nameText.setText(name).setColor(color);
       const x = portraitKey ? 170 : 50;
       this.portrait.setVisible(!!portraitKey);

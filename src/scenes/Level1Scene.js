@@ -6,14 +6,21 @@ import Pigeon from '../entities/Pigeon.js';
 import Controls from '../Controls.js';
 import Dialog from '../ui/Dialog.js';
 import { makeButton } from '../ui/button.js';
+import BaseLevel from './BaseLevel.js';
 import { getDifficulty } from '../data/difficulty.js';
+import { music, sfx } from '../audio/sound.js';
+
+const formatTime = (ms) => {
+  const secs = Math.round(ms / 1000);
+  return `${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, '0')}`;
+};
 
 const WORLD_W = 1600;
 const WORLD_H = 1200;
 
 // LEVEL 1 (designed by Elin): Spy Pond Park.
 // A man feeds bread to a pigeon. It eats and eats and gets GIANT. The SuperKids must stop it!
-export default class Level1Scene extends Phaser.Scene {
+export default class Level1Scene extends BaseLevel {
   constructor() {
     super('Level1');
   }
@@ -59,6 +66,7 @@ export default class Level1Scene extends Phaser.Scene {
     this.createHud();
 
     this.fightActive = false;
+    music.play('explore');
     this.cameras.main.setBounds(0, 0, WORLD_W, WORLD_H);
 
     if (this.skipIntro) {
@@ -72,12 +80,6 @@ export default class Level1Scene extends Phaser.Scene {
   }
 
   // ---------- the park ----------
-
-  addBlocker(x, y, w, h) {
-    const z = this.add.zone(x, y, w, h);
-    this.physics.add.existing(z, true);
-    this.obstacles.add(z);
-  }
 
   drawPark() {
     const rnd = new Phaser.Math.RandomDataGenerator(['spy-pond']);
@@ -217,36 +219,13 @@ export default class Level1Scene extends Phaser.Scene {
 
   // ---------- helpers ----------
 
-  wait(ms) {
-    return new Promise((resolve) => this.time.delayedCall(ms, resolve));
-  }
-
-  say(who, text) {
-    const color = who.cape ? colorHex(who.cape) : '#ffd23f';
-    return this.dialog.show(who.name, text, `char-${who.id}`, color);
-  }
-
-  popText(x, y, str, color = 0xffffff, size = 28) {
-    const t = this.add
-      .text(x, y, str, {
-        fontFamily: 'Arial Black, Arial',
-        fontSize: `${size}px`,
-        color: colorHex(color),
-        stroke: '#000000',
-        strokeThickness: Math.max(4, size / 7),
-      })
-      .setOrigin(0.5)
-      .setDepth(15000);
-    this.tweens.add({ targets: t, y: y - 50, alpha: 0, duration: 900, ease: 'Cubic.easeOut', onComplete: () => t.destroy() });
-    return t;
-  }
-
   throwBread(tx, ty) {
     const b = this.add.image(this.man.x + 18, this.man.y, 'bread').setDepth(9000);
     b.landed = false;
     this.breads.push(b);
     const sx = b.x;
     const sy = b.y;
+    sfx('toss');
     this.tweens.add({ targets: this.man, angle: { from: -10, to: 10 }, duration: 120, yoyo: true, onComplete: () => this.man.setAngle(0) });
     return new Promise((resolve) => {
       this.tweens.addCounter({
@@ -289,6 +268,7 @@ export default class Level1Scene extends Phaser.Scene {
   pigeonEats(b) {
     this.removeBread(b);
     this.pigeon.eat();
+    sfx('gulp');
     this.popText(this.pigeon.x, this.pigeon.y - this.pigeon.radius - 10, 'GULP!', 0xffe14d, 34);
   }
 
@@ -297,6 +277,7 @@ export default class Level1Scene extends Phaser.Scene {
     const hit = new Set();
     const st = { r: startR };
     this.cameras.main.shake(200, 0.006);
+    sfx('flap');
     this.popText(x, y - startR - 20, 'FLAP!', 0xffffff, 36);
     this.tweens.add({ targets: ring, alpha: 0, duration: 600 });
     this.tweens.add({
@@ -320,6 +301,7 @@ export default class Level1Scene extends Phaser.Scene {
 
   featherVolley(x, y, angle, n, r) {
     const spread = 0.22;
+    sfx('shoot');
     for (let i = 0; i < n; i++) {
       const a = angle + (i - (n - 1) / 2) * spread;
       const f = this.feathers.create(x + Math.cos(a) * r * 0.8, y + Math.sin(a) * r * 0.8, 'feather');
@@ -338,10 +320,12 @@ export default class Level1Scene extends Phaser.Scene {
       await p.walkTo(b.x, b.y, 160);
       this.removeBread(b);
       this.popText(p.x, p.y - 30 - p.radius, 'nom!', 0xffffff, 24);
+      sfx('gulp');
       await this.wait(250);
     }
     this.cameras.main.shake(400, shake);
     this.popText(p.x, p.y - p.radius - 40, 'GROW!', 0xffe14d, 40);
+    sfx('grow');
     await p.growTo(newScale, 800);
     await this.wait(300);
   }
@@ -360,6 +344,8 @@ export default class Level1Scene extends Phaser.Scene {
     await this.feedPigeon(3, 2.1, 0.02);
 
     this.popText(this.pigeon.x, this.pigeon.y - 140, 'COOOOOO!!!', 0xffffff, 64);
+    sfx('bigCoo');
+    music.stop();
     cam.shake(700, 0.02);
     await this.wait(1000);
     await this.say(MAN, 'Oh dear! HELP! SUPERKIDS!!');
@@ -384,6 +370,8 @@ export default class Level1Scene extends Phaser.Scene {
 
   startFight() {
     this.fightActive = true;
+    music.play('boss');
+    sfx('fight');
     this.fightStart = this.time.now;
     this.pigeon.ai = true;
     this.controls.setEnabled(true);
@@ -424,9 +412,13 @@ export default class Level1Scene extends Phaser.Scene {
     const p = this.pigeon;
     this.cameras.main.shake(500, 0.015);
     this.popText(p.x, p.y - p.radius - 20, 'BONK!', 0xffe14d, 60);
+    music.stop();
+    sfx('bonk');
     await this.wait(700);
+    sfx('shrink');
     await p.growTo(0.5, 1500, 'Sine.easeInOut');
     this.popText(p.x, p.y - 40, 'coo?', 0xffffff, 26);
+    sfx('coo');
     await this.wait(800);
 
     const [elin, olivia, reese, jay] = KIDS;
@@ -442,17 +434,26 @@ export default class Level1Scene extends Phaser.Scene {
     p.sprite.setVisible(false);
 
     this.popText(this.elin.x, this.elin.y - 100, 'SUPERKIDS WIN!', 0xffe14d, 56);
+    music.play('win');
     this.kids.forEach((k, i) =>
       this.tweens.add({ targets: k.sprite, y: k.y - 30, duration: 220, yoyo: true, repeat: 3, delay: i * 90 })
     );
     await this.say(olivia, 'Yay! On to the next adventure!');
-    this.scene.start('LevelComplete', { level: 1, bread: this.breadCollected, time: elapsed, difficulty: this.diff.label });
+    this.levelComplete({
+      level: 1,
+      replay: 'Level1',
+      next: 'Level2',
+      subtitle: 'You stopped the Giant Pigeon!',
+      stats: `${this.diff.label}     Bread grabbed: ${this.breadCollected}     Time: ${formatTime(elapsed)}`,
+    });
   }
 
   onElinDown() {
     this.stopAction();
     this.pigeon.ai = false;
     this.elin.dizzyUntil = Infinity;
+    music.stop();
+    sfx('sad');
     const { width: W, height: H } = this.scale;
     this.add.rectangle(0, 0, W, H, 0x000000, 0.55).setOrigin(0).setScrollFactor(0).setDepth(29000);
     this.add
@@ -487,6 +488,7 @@ export default class Level1Scene extends Phaser.Scene {
         if (b.landed && Phaser.Math.Distance.Between(this.elin.x, this.elin.y + 10, b.x, b.y) < 38) {
           this.removeBread(b);
           this.breadCollected++;
+          sfx('collect');
           if (this.elin.hp < this.elin.maxHp) {
             this.elin.hp++;
             this.popText(this.elin.x, this.elin.y - 50, '+1 heart', 0xff6b9a, 22);

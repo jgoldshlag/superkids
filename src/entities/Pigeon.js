@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { sfx } from '../audio/sound.js';
 
 // The pigeon from Level 1. It starts tiny, eats bread, and becomes a GIANT boss.
 // Attacks: peck-dash, wing-flap shockwave, feather shots.
@@ -110,6 +111,7 @@ export default class Pigeon {
       this.dashDir.set(e.x - this.x, e.y - this.y).normalize();
       this.faceTo(e.x, e.y);
       this.scene.popText(this.x, this.y - this.radius - 20, '!', 0xff3333, 56);
+      sfx('alert');
       this.setState('telegraph');
     } else if (r < 0.7) {
       this.setState('flapWindup');

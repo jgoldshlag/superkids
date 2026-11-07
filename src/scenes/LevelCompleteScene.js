@@ -2,7 +2,9 @@ import Phaser from 'phaser';
 import { createArt } from '../art.js';
 import { KIDS } from '../data/characters.js';
 import { makeButton } from '../ui/button.js';
+import { music } from '../audio/sound.js';
 
+// data: { level, subtitle, stats, replay: sceneKey, next: sceneKey | null }
 export default class LevelCompleteScene extends Phaser.Scene {
   constructor() {
     super('LevelComplete');
@@ -10,6 +12,7 @@ export default class LevelCompleteScene extends Phaser.Scene {
 
   create(data) {
     createArt(this);
+    music.play('hero');
     const { width: W, height: H } = this.scale;
     this.add.rectangle(0, 0, W, H, 0x2b2d6e).setOrigin(0);
 
@@ -36,9 +39,7 @@ export default class LevelCompleteScene extends Phaser.Scene {
         strokeThickness: 10,
       })
       .setOrigin(0.5);
-    this.add
-      .text(W / 2, 185, 'You stopped the Giant Pigeon!', { fontFamily: 'Arial', fontSize: '30px', color: '#ffffff' })
-      .setOrigin(0.5);
+    this.add.text(W / 2, 185, data.subtitle, { fontFamily: 'Arial', fontSize: '30px', color: '#ffffff' }).setOrigin(0.5);
 
     KIDS.forEach((k, i) => {
       const x = W / 2 - 210 + i * 140;
@@ -47,16 +48,18 @@ export default class LevelCompleteScene extends Phaser.Scene {
       this.tweens.add({ targets: img, y: 290, duration: 300, yoyo: true, repeat: -1, delay: i * 120, ease: 'Sine.easeOut' });
     });
 
-    const secs = Math.round((data.time || 0) / 1000);
-    const time = `${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, '0')}`;
-    this.add
-      .text(W / 2, 460, `${data.difficulty}     Bread grabbed: ${data.bread}     Time: ${time}`, { fontFamily: 'Arial', fontSize: '28px', color: '#9be7ff' })
-      .setOrigin(0.5);
+    this.add.text(W / 2, 460, data.stats, { fontFamily: 'Arial', fontSize: '28px', color: '#9be7ff' }).setOrigin(0.5);
 
-    makeButton(this, W / 2 - 170, 580, 'Play Again', () => this.scene.start('Level1'));
-    makeButton(this, W / 2 + 170, 580, 'Main Menu', () => this.scene.start('Title'), 0x4c6ef5);
-    this.add
-      .text(W / 2, 680, 'Level 2 coming soon!', { fontFamily: 'Arial', fontSize: '24px', color: '#ffffff' })
-      .setOrigin(0.5);
+    if (data.next && this.scene.manager.keys[data.next]) {
+      makeButton(this, W / 2, 560, 'Next Level!', () => this.scene.start(data.next), 0x2ec46d);
+      makeButton(this, W / 2 - 170, 660, 'Play Again', () => this.scene.start(data.replay));
+      makeButton(this, W / 2 + 170, 660, 'Pick Level', () => this.scene.start('LevelSelect'), 0x4c6ef5);
+    } else {
+      makeButton(this, W / 2 - 170, 580, 'Play Again', () => this.scene.start(data.replay));
+      makeButton(this, W / 2 + 170, 580, 'Pick Level', () => this.scene.start('LevelSelect'), 0x4c6ef5);
+      this.add
+        .text(W / 2, 680, `Level ${data.level + 1} coming soon!`, { fontFamily: 'Arial', fontSize: '24px', color: '#ffffff' })
+        .setOrigin(0.5);
+    }
   }
 }

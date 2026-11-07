@@ -6,6 +6,7 @@ export default class VirtualJoystick {
     this.radius = radius;
     this.pointer = null;
     this.enabled = true;
+    this.anywhere = false; // true = touch anywhere on screen (when there's no punch button)
     this.x = 0;
     this.y = 0;
 
@@ -14,7 +15,7 @@ export default class VirtualJoystick {
     for (const o of [this.base, this.knob]) o.setScrollFactor(0).setDepth(9500).setVisible(false);
 
     scene.input.on('pointerdown', (p) => {
-      if (!this.enabled || this.pointer || p.x > scene.scale.width / 2) return;
+      if (!this.enabled || this.pointer || (!this.anywhere && p.x > scene.scale.width / 2)) return;
       this.pointer = p;
       this.base.setPosition(p.x, p.y).setVisible(true);
       this.knob.setPosition(p.x, p.y).setVisible(true);

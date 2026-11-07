@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { colorHex } from '../data/characters.js';
+import { sfx } from '../audio/sound.js';
 
 const POW_WORDS = ['POW!', 'BAM!', 'WHAM!', 'BOP!', 'ZAP!'];
 
@@ -92,9 +93,11 @@ export default class Kid {
 
     if (target && target.alive && Phaser.Math.Distance.Between(px, py, target.x, target.y) < target.radius + 28) {
       target.damage(damage, this);
+      sfx('punch');
       this.scene.popText(px, py - 20, Phaser.Utils.Array.GetRandom(POW_WORDS), this.def.cape);
       return true;
     }
+    sfx('swing');
     return false;
   }
 
@@ -115,6 +118,7 @@ export default class Kid {
     const now = this.scene.time.now;
     if (now < this.invulnUntil || this.dizzy) return false;
     this.hp -= 1;
+    sfx('hurt');
     this.invulnUntil = now + 1100;
     this.knock(fromX, fromY, power, 220);
     this.sprite.setTint(0xff6666);
@@ -141,7 +145,7 @@ export default class Kid {
       s.setAngle(0);
     }
     s.setAlpha(time < this.invulnUntil ? (Math.floor(time / 80) % 2 ? 0.4 : 1) : 1);
-    s.setDepth(s.y);
+    s.setDepth(this.depthOverride ?? s.y);
     this.shadow.setPosition(s.x, s.y + 28);
     this.label.setPosition(s.x, s.y - 44);
     const dz = this.dizzy;

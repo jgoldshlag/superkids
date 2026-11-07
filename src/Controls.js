@@ -5,12 +5,14 @@ import VirtualJoystick from './VirtualJoystick.js';
 // Keyboard: arrows/WASD to move, SPACE (or J) to punch.
 // Touch: drag on the left half to move, touch the right half (POW! button) to punch.
 export default class Controls {
-  constructor(scene) {
+  constructor(scene, { attack = true } = {}) {
     this.scene = scene;
     this.enabled = false;
+    this.hasAttack = attack;
     this.keys = scene.input.keyboard ? scene.input.keyboard.addKeys('UP,DOWN,LEFT,RIGHT,W,A,S,D,SPACE,J') : null;
     this.joystick = new VirtualJoystick(scene);
     this.joystick.enabled = false;
+    this.joystick.anywhere = !attack;
     this.attackPointer = null;
     this.isTouch = scene.sys.game.device.input.touch;
 
@@ -29,7 +31,7 @@ export default class Controls {
       .setVisible(false);
 
     scene.input.on('pointerdown', (p) => {
-      if (!this.enabled || p.x <= width / 2) return;
+      if (!this.enabled || !this.hasAttack || p.x <= width / 2) return;
       this.attackPointer = p;
       this.button.setScale(0.9);
     });
@@ -45,8 +47,8 @@ export default class Controls {
   setEnabled(on) {
     this.enabled = on;
     this.joystick.enabled = on;
-    this.button.setVisible(on && this.isTouch);
-    this.buttonText.setVisible(on && this.isTouch);
+    this.button.setVisible(on && this.isTouch && this.hasAttack);
+    this.buttonText.setVisible(on && this.isTouch && this.hasAttack);
     if (!on) {
       this.attackPointer = null;
       this.joystick.release();
@@ -69,7 +71,7 @@ export default class Controls {
   }
 
   get attackHeld() {
-    if (!this.enabled) return false;
+    if (!this.enabled || !this.hasAttack) return false;
     return !!this.attackPointer || !!(this.keys && (this.keys.SPACE.isDown || this.keys.J.isDown));
   }
 }

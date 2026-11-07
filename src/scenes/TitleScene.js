@@ -3,6 +3,7 @@ import { createArt } from '../art.js';
 import { KIDS } from '../data/characters.js';
 import { DIFFICULTIES } from '../data/difficulty.js';
 import { makeButton } from '../ui/button.js';
+import { music, sfx, isMuted, setMuted } from '../audio/sound.js';
 
 export default class TitleScene extends Phaser.Scene {
   constructor() {
@@ -12,6 +13,20 @@ export default class TitleScene extends Phaser.Scene {
   create() {
     createArt(this);
     const { width } = this.scale;
+    music.play('hero');
+
+    // Sound on/off
+    const soundBtn = this.add
+      .text(width - 20, 20, '', { fontFamily: 'Arial', fontSize: '24px', fontStyle: 'bold', color: '#ffffff', backgroundColor: '#3a3d5c', padding: { x: 12, y: 8 } })
+      .setOrigin(1, 0)
+      .setInteractive({ useHandCursor: true });
+    const showSound = () => soundBtn.setText(isMuted() ? '🔇 Sound OFF' : '🔊 Sound ON');
+    showSound();
+    soundBtn.on('pointerdown', () => {
+      setMuted(!isMuted());
+      showSound();
+      sfx('click');
+    });
     this.add
       .text(width / 2, 140, 'SuperKids', {
         fontFamily: 'Arial Black, Arial, sans-serif',
@@ -41,7 +56,7 @@ export default class TitleScene extends Phaser.Scene {
 
     const start = (key) => {
       this.registry.set('difficulty', key);
-      this.scene.start('Level1');
+      this.scene.start('LevelSelect');
     };
 
     Object.entries(DIFFICULTIES).forEach(([key, d], i) => {
