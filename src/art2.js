@@ -103,15 +103,30 @@ function drawTreehouse(g) {
   g.fillStyle(0xffd23f, 1).fillTriangle(121, 0, 121, 14, 142, 7);
 }
 
+// Penny, Olivia's golden retriever (side view, facing right). 60x44.
 function drawDog(g) {
-  g.fillStyle(0xa86b3c, 1);
-  g.fillEllipse(22, 22, 30, 18); // body
-  g.fillRect(10, 26, 5, 9).fillRect(29, 26, 5, 9); // legs
-  g.fillCircle(36, 14, 9); // head
-  g.fillStyle(0x6d4320, 1).fillEllipse(30, 9, 7, 12).fillEllipse(42, 9, 7, 12); // ears
-  g.fillStyle(0x000000, 1).fillCircle(34, 13, 1.6).fillCircle(39, 13, 1.6).fillCircle(37, 18, 2);
-  g.lineStyle(4, 0xa86b3c, 1).lineBetween(8, 18, 2, 8); // tail
-  g.fillStyle(0xd7263d, 1).fillRect(29, 20, 13, 3); // collar
+  const gold = 0xe0a84a;
+  const light = 0xf3cd85;
+  const dark = 0xb9802f;
+  // fluffy tail
+  g.fillStyle(gold, 1).fillEllipse(8, 14, 16, 8).fillEllipse(4, 9, 8, 8);
+  // legs
+  g.fillStyle(dark, 1).fillRect(14, 28, 6, 14).fillRect(36, 28, 6, 14);
+  g.fillStyle(gold, 1).fillRect(19, 29, 6, 13).fillRect(41, 29, 6, 13);
+  // body + chest fluff
+  g.fillStyle(gold, 1).fillEllipse(30, 24, 38, 20);
+  g.fillStyle(light, 1).fillEllipse(42, 28, 14, 14);
+  // head
+  g.fillStyle(gold, 1).fillCircle(46, 14, 10);
+  g.fillStyle(light, 1).fillEllipse(54, 18, 12, 9); // snout
+  g.fillStyle(0x222222, 1).fillCircle(59, 16, 2.4); // nose
+  g.fillStyle(0x222222, 1).fillCircle(48, 11, 1.8); // eye
+  g.fillStyle(0xffffff, 1).fillCircle(48.6, 10.4, 0.6);
+  g.fillStyle(0xff7b9c, 1).fillEllipse(55, 24, 4, 6); // tongue
+  // floppy ear
+  g.fillStyle(dark, 1).fillEllipse(41, 16, 8, 14);
+  // red collar
+  g.fillStyle(0xd7263d, 1).fillRect(36, 19, 4, 10);
 }
 
 function drawMailbox(g) {
@@ -133,7 +148,7 @@ export function createLevel2Art(scene) {
   make('house-olivia', 220, 200, (g) => drawHouse(g, 0xffe066, 0xc0392b, 0xff6fb5)); // yellow with a pink door
   [0xe74c3c, 0x3498db, 0xf5f5f5, 0x2ecc71, 0x34495e].forEach((c, i) => make(`car-${i}`, 104, 52, (g) => drawCar(g, c)));
   make('treehouse', 240, 260, drawTreehouse);
-  make('dog', 48, 36, drawDog);
+  make('dog', 62, 44, drawDog);
   make('mailbox', 30, 48, drawMailbox);
   for (const def of Object.values(NEIGHBORS)) make(`char-${def.id}`, 48, 64, (g) => drawPerson(g, def));
 }

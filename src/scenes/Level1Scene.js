@@ -1,38 +1,23 @@
 import Phaser from 'phaser';
 import { createArt } from '../art.js';
-import { KIDS, MAN, colorHex } from '../data/characters.js';
+import { KIDS, MAN } from '../data/characters.js';
 import Kid from '../entities/Kid.js';
 import Pigeon from '../entities/Pigeon.js';
-import Controls from '../Controls.js';
-import Dialog from '../ui/Dialog.js';
-import { makeButton } from '../ui/button.js';
-import BaseLevel from './BaseLevel.js';
-import { getDifficulty } from '../data/difficulty.js';
+import BossLevel, { formatTime } from './BossLevel.js';
 import { music, sfx } from '../audio/sound.js';
-
-const formatTime = (ms) => {
-  const secs = Math.round(ms / 1000);
-  return `${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, '0')}`;
-};
 
 const WORLD_W = 1600;
 const WORLD_H = 1200;
 
 // LEVEL 1 (designed by Elin): Spy Pond Park.
 // A man feeds bread to a pigeon. It eats and eats and gets GIANT. The SuperKids must stop it!
-export default class Level1Scene extends BaseLevel {
+export default class Level1Scene extends BossLevel {
   constructor() {
     super('Level1');
   }
 
-  init(data) {
-    const params = new URLSearchParams(window.location.search);
-    this.skipIntro = !!data?.skipIntro || params.has('skipintro');
-  }
-
   create() {
     createArt(this);
-    this.diff = getDifficulty(this);
     this.physics.world.setBounds(0, 0, WORLD_W, WORLD_H);
     this.obstacles = this.physics.add.staticGroup();
 
@@ -43,29 +28,12 @@ export default class Level1Scene extends BaseLevel {
     this.addBlocker(520, 418, 100, 30);
     this.man = this.add.image(520, 392, 'char-man').setDepth(400);
 
-    this.pigeon = new Pigeon(this, 640, 500, new Phaser.Geom.Rectangle(130, 330, WORLD_W - 260, WORLD_H - 450), this.diff);
-
     this.kids = KIDS.map((def, i) => new Kid(this, 760 + i * 70, 1010, def, def.id === 'elin'));
     this.elin = this.kids[0];
     this.bots = this.kids.slice(1);
-    this.elin.maxHp = this.elin.hp = this.diff.elinHearts;
-    for (const k of this.kids) this.physics.add.collider(k.sprite, this.obstacles);
+    this.boss = this.pigeon = new Pigeon(this, 640, 500, new Phaser.Geom.Rectangle(130, 330, WORLD_W - 260, WORLD_H - 450), this.diff);
+    this.setupFight({ bossName: 'GIANT PIGEON', shortName: 'pigeon', foodTexture: 'bread' });
 
-    this.breads = [];
-    this.breadCollected = 0;
-    this.feathers = this.physics.add.group();
-    for (const k of this.kids) {
-      this.physics.add.overlap(k.sprite, this.feathers, (ks, f) => {
-        if (!f.active) return;
-        if (ks.kid.hit(f.x - f.body.velocity.x, f.y - f.body.velocity.y, 300)) f.destroy();
-      });
-    }
-
-    this.controls = new Controls(this);
-    this.dialog = new Dialog(this);
-    this.createHud();
-
-    this.fightActive = false;
     music.play('explore');
     this.cameras.main.setBounds(0, 0, WORLD_W, WORLD_H);
 
@@ -78,8 +46,6 @@ export default class Level1Scene extends BaseLevel {
       this.runIntro();
     }
   }
-
-  // ---------- the park ----------
 
   drawPark() {
     const rnd = new Phaser.Math.RandomDataGenerator(['spy-pond']);
@@ -177,52 +143,12 @@ export default class Level1Scene extends BaseLevel {
     this.addBlocker(415, 1100, 150, 20);
   }
 
-  // ---------- HUD ----------
-
-  createHud() {
-    const { width: W } = this.scale;
-    this.hearts = [];
-    for (let i = 0; i < this.elin.maxHp; i++) {
-      this.hearts.push(this.add.image(30 + i * 32, 30, 'heart').setScrollFactor(0).setDepth(9500));
-    }
-    this.add.image(W - 95, 30, 'bread').setScale(1.4).setScrollFactor(0).setDepth(9500);
-    this.breadText = this.add
-      .text(W - 72, 30, 'x 0', { fontFamily: 'Arial Black, Arial', fontSize: '24px', color: '#ffffff', stroke: '#000', strokeThickness: 4 })
-      .setOrigin(0, 0.5)
-      .setScrollFactor(0)
-      .setDepth(9500);
-
-    const bw = 420;
-    this.add
-      .text(16, 54, this.diff.label, { fontFamily: 'Arial Black, Arial', fontSize: '16px', color: colorHex(this.diff.color), stroke: '#000', strokeThickness: 4 })
-      .setScrollFactor(0)
-      .setDepth(9500);
-
-    this.bossBar = this.add.container(W / 2, 0).setDepth(9500).setVisible(false);
-    const name = this.add
-      .text(0, 16, 'GIANT PIGEON', { fontFamily: 'Arial Black, Arial', fontSize: '20px', color: '#ffffff', stroke: '#000', strokeThickness: 4 })
-      .setOrigin(0.5, 0);
-    const bg = this.add.rectangle(-bw / 2, 44, bw, 20, 0x222222).setOrigin(0, 0).setStrokeStyle(3, 0xffffff);
-    this.bossFill = this.add.rectangle(-bw / 2 + 2, 46, bw - 4, 16, 0x9b5de5).setOrigin(0, 0);
-    this.bossFillWidth = bw - 4;
-    this.bossBar.add([name, bg, this.bossFill]);
-    this.bossBar.setScrollFactor(0, 0, true);
-  }
-
-  updateHud() {
-    this.hearts.forEach((h, i) => h.setTexture(i < this.elin.hp ? 'heart' : 'heart-empty'));
-    this.breadText.setText(`x ${this.breadCollected}`);
-    const p = this.pigeon;
-    this.bossFill.width = Math.max(0, (this.bossFillWidth * p.hp) / p.maxHp);
-    this.bossFill.fillColor = p.angry ? 0xff3b5c : 0x9b5de5;
-  }
-
-  // ---------- helpers ----------
+  // ---------- bread ----------
 
   throwBread(tx, ty) {
     const b = this.add.image(this.man.x + 18, this.man.y, 'bread').setDepth(9000);
     b.landed = false;
-    this.breads.push(b);
+    this.addFood(b);
     const sx = b.x;
     const sy = b.y;
     sfx('toss');
@@ -246,71 +172,6 @@ export default class Level1Scene extends BaseLevel {
     });
   }
 
-  removeBread(b) {
-    this.breads = this.breads.filter((x) => x !== b);
-    b.destroy();
-  }
-
-  nearestBread(x, y, maxDist) {
-    let best = null;
-    let bestD = maxDist;
-    for (const b of this.breads) {
-      if (!b.landed) continue;
-      const d = Phaser.Math.Distance.Between(x, y, b.x, b.y);
-      if (d < bestD) {
-        best = b;
-        bestD = d;
-      }
-    }
-    return best;
-  }
-
-  pigeonEats(b) {
-    this.removeBread(b);
-    this.pigeon.eat();
-    sfx('gulp');
-    this.popText(this.pigeon.x, this.pigeon.y - this.pigeon.radius - 10, 'GULP!', 0xffe14d, 34);
-  }
-
-  shockwave(x, y, startR, size) {
-    const ring = this.add.circle(x, y, startR).setStrokeStyle(10, 0xffffff, 0.9).setDepth(8000);
-    const hit = new Set();
-    const st = { r: startR };
-    this.cameras.main.shake(200, 0.006);
-    sfx('flap');
-    this.popText(x, y - startR - 20, 'FLAP!', 0xffffff, 36);
-    this.tweens.add({ targets: ring, alpha: 0, duration: 600 });
-    this.tweens.add({
-      targets: st,
-      r: startR + size,
-      duration: 600,
-      onUpdate: () => {
-        ring.setRadius(st.r);
-        for (const k of this.kids) {
-          if (hit.has(k)) continue;
-          const d = Phaser.Math.Distance.Between(x, y, k.x, k.y);
-          if (d < st.r + 12 && d > st.r - 45) {
-            hit.add(k);
-            k.hit(x, y, 480);
-          }
-        }
-      },
-      onComplete: () => ring.destroy(),
-    });
-  }
-
-  featherVolley(x, y, angle, n, r) {
-    const spread = 0.22;
-    sfx('shoot');
-    for (let i = 0; i < n; i++) {
-      const a = angle + (i - (n - 1) / 2) * spread;
-      const f = this.feathers.create(x + Math.cos(a) * r * 0.8, y + Math.sin(a) * r * 0.8, 'feather');
-      f.setRotation(a).setDepth(8500);
-      this.physics.velocityFromRotation(a, 300, f.body.velocity);
-      f.born = this.time.now;
-    }
-  }
-
   // ---------- story ----------
 
   async feedPigeon(count, newScale, shake) {
@@ -318,7 +179,7 @@ export default class Level1Scene extends BaseLevel {
     for (let i = 0; i < count; i++) {
       const b = await this.throwBread(p.x + Phaser.Math.Between(-90, 90), p.y + Phaser.Math.Between(40, 100));
       await p.walkTo(b.x, b.y, 160);
-      this.removeBread(b);
+      this.removeFood(b);
       this.popText(p.x, p.y - 30 - p.radius, 'nom!', 0xffffff, 24);
       sfx('gulp');
       await this.wait(250);
@@ -368,44 +229,20 @@ export default class Level1Scene extends BaseLevel {
     this.startFight();
   }
 
-  startFight() {
-    this.fightActive = true;
-    music.play('boss');
-    sfx('fight');
-    this.fightStart = this.time.now;
-    this.pigeon.ai = true;
-    this.controls.setEnabled(true);
-    this.cameras.main.startFollow(this.elin.sprite, true, 0.12, 0.12);
-    this.bossBar.setVisible(true);
-    this.popText(this.scale.width / 2, this.scale.height / 2, 'FIGHT!', 0xffe14d, 80).setScrollFactor(0);
-
+  onFightStart() {
     // Mr. Crumbs just can't stop feeding the pigeon...
-    this.breadTimer = this.time.addEvent({
+    this.foodTimer = this.time.addEvent({
       delay: 4500,
       loop: true,
       callback: () => {
-        if (!this.fightActive || this.breads.length >= 3) return;
+        if (!this.fightActive || this.foods.length >= 3) return;
         this.throwBread(Phaser.Math.Between(200, WORLD_W - 200), Phaser.Math.Between(420, WORLD_H - 140));
         if (Math.random() < 0.3) this.popText(this.man.x, this.man.y - 50, 'Oops! More bread!', 0xffffff, 18);
       },
     });
   }
 
-  onPigeonAngry() {
-    this.popText(this.pigeon.x, this.pigeon.y - this.pigeon.radius - 40, 'The pigeon is ANGRY!', 0xff3b5c, 34);
-    this.cameras.main.shake(300, 0.01);
-  }
-
-  stopAction() {
-    this.fightActive = false;
-    this.controls.setEnabled(false);
-    this.breadTimer?.remove();
-    this.feathers.clear(true, true);
-    for (const b of [...this.breads]) this.removeBread(b);
-    for (const k of this.kids) k.sprite.setVelocity(0, 0);
-  }
-
-  async onPigeonDefeated() {
+  async onBossDefeated() {
     const elapsed = this.time.now - this.fightStart;
     this.stopAction();
     this.bossBar.setVisible(false);
@@ -444,86 +281,7 @@ export default class Level1Scene extends BaseLevel {
       replay: 'Level1',
       next: 'Level2',
       subtitle: 'You stopped the Giant Pigeon!',
-      stats: `${this.diff.label}     Bread grabbed: ${this.breadCollected}     Time: ${formatTime(elapsed)}`,
+      stats: `${this.diff.label}     Bread grabbed: ${this.foodCollected}     Time: ${formatTime(elapsed)}`,
     });
-  }
-
-  onElinDown() {
-    this.stopAction();
-    this.pigeon.ai = false;
-    this.elin.dizzyUntil = Infinity;
-    music.stop();
-    sfx('sad');
-    const { width: W, height: H } = this.scale;
-    this.add.rectangle(0, 0, W, H, 0x000000, 0.55).setOrigin(0).setScrollFactor(0).setDepth(29000);
-    this.add
-      .text(W / 2, H / 2 - 80, 'Oh no! Elin got bonked!', {
-        fontFamily: 'Arial Black, Arial',
-        fontSize: '48px',
-        color: '#ffe14d',
-        stroke: '#000',
-        strokeThickness: 8,
-      })
-      .setOrigin(0.5)
-      .setScrollFactor(0)
-      .setDepth(29001);
-    makeButton(this, W / 2, H / 2 + 40, 'Try Again', () => this.scene.restart({ skipIntro: true }));
-  }
-
-  // ---------- every frame ----------
-
-  update(time, delta) {
-    if (this.fightActive) {
-      // Elin (you!)
-      const v = this.controls.moveVector;
-      this.elin.walk(v.x, v.y);
-      if (this.controls.attackHeld) {
-        const p = this.pigeon;
-        if (Phaser.Math.Distance.Between(this.elin.x, this.elin.y, p.x, p.y) < p.radius + 90) this.elin.faceToward(p.x, p.y);
-        this.elin.punch(p, 5, 280);
-      }
-
-      // Grab bread to stop the pigeon eating it (and get a heart back)
-      for (const b of [...this.breads]) {
-        if (b.landed && Phaser.Math.Distance.Between(this.elin.x, this.elin.y + 10, b.x, b.y) < 38) {
-          this.removeBread(b);
-          this.breadCollected++;
-          sfx('collect');
-          if (this.elin.hp < this.elin.maxHp) {
-            this.elin.hp++;
-            this.popText(this.elin.x, this.elin.y - 50, '+1 heart', 0xff6b9a, 22);
-          } else {
-            this.popText(this.elin.x, this.elin.y - 50, 'Got it!', 0xffffff, 22);
-          }
-        }
-      }
-
-      // The bots help!
-      this.bots.forEach((bot, i) => this.updateBot(bot, i, time));
-
-      // Old feathers disappear
-      for (const f of this.feathers.getChildren().slice()) if (time - f.born > 2500) f.destroy();
-    }
-
-    this.pigeon.update(time, delta);
-    for (const k of this.kids) k.update(time, delta);
-    this.updateHud();
-  }
-
-  updateBot(bot, i, time) {
-    const p = this.pigeon;
-    if (!p.alive) {
-      bot.walk(0, 0);
-      return;
-    }
-    // Each bot circles to a different side of the pigeon. They back off when it gets ready to dash or flap.
-    const danger = p.state === 'telegraph' || p.state === 'dash' || p.state === 'flapWindup';
-    const a = (i / this.bots.length) * Math.PI * 2 + time / 3000;
-    const r = danger ? p.radius + 170 : p.radius + 18;
-    bot.walkToward(p.x + Math.cos(a) * r, p.y + Math.sin(a) * r, 12);
-    if (!danger && Phaser.Math.Distance.Between(bot.x, bot.y, p.x, p.y) < p.radius + 40) {
-      bot.faceToward(p.x, p.y);
-      bot.punch(p, this.diff.botDamage, Phaser.Math.Between(900, 1300));
-    }
   }
 }

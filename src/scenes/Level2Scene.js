@@ -220,7 +220,7 @@ export default class Level2Scene extends BaseLevel {
     const mk = (x, y, key) => {
       const sp = this.add.image(x, y, key).setDepth(y);
       this.add.ellipse(x, y + 28, 32, 10, 0x000000, 0.22).setDepth(2);
-      this.addBlocker(x, y + 20, 26, 20);
+      sp.blocker = this.addBlocker(x, y + 20, 26, 20);
       return sp;
     };
     const elin = KIDS[0];
@@ -247,8 +247,8 @@ export default class Level2Scene extends BaseLevel {
         sprite: mk(2720, 610, 'dog'),
         dog: true,
         lines: [
-          [{ name: 'Biscuit the dog', portrait: 'dog', color: '#d9a066' }, 'Woof! Woof woof! *wag wag wag*'],
-          [reese, "That's Olivia's dog, Biscuit! I think he wants us to follow him!"],
+          [{ name: 'Penny', portrait: 'dog', color: '#e0a84a' }, 'Woof! Woof woof! *wag wag wag*'],
+          [reese, "That's Penny, Olivia's golden retriever! I think Penny wants us to follow!"],
         ],
         after: () => this.dogRuns(),
       },
@@ -264,6 +264,7 @@ export default class Level2Scene extends BaseLevel {
 
   async dogRuns() {
     const dog = this.npcs[2].sprite;
+    dog.blocker?.destroy();
     this.popText(dog.x, dog.y - 40, 'Woof!', 0xffffff, 24);
     sfx('woof');
     const run = (x, y, ms) =>
@@ -382,25 +383,11 @@ export default class Level2Scene extends BaseLevel {
           })
       )
     );
-    this.cameras.main.pan(TREEHOUSE.x, TREEHOUSE.y + 150, 600);
-    await this.say(elin, 'Wow! This is the BEST treehouse ever!');
-    await this.say(reese, 'It even has a flag on top!');
-    await this.say(jay, 'Ooh! Can this be our SuperKids HEADQUARTERS?');
-    await this.say(olivia, 'YES! Welcome to SuperKids HQ!');
-    this.popText(TREEHOUSE.x, TREEHOUSE.y - 100, 'SUPERKIDS HQ!', 0xffe14d, 52);
-    this.kids.forEach((k, i) =>
-      this.tweens.add({ targets: k.sprite, y: k.y - 20, duration: 200, yoyo: true, repeat: 3, delay: i * 90 })
-    );
-    await this.wait(1800);
-
-    const secs = Math.round(elapsed / 1000);
-    this.levelComplete({
-      level: 2,
-      replay: 'Level2',
-      next: null,
-      subtitle: "You found Olivia's treehouse!",
-      stats: `Stars found: ${this.starsFound}/${STARS.length}     Time: ${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, '0')}`,
-    });
+    // Go inside!
+    await this.wait(300);
+    this.cameras.main.fadeOut(600, 0, 0, 0);
+    await this.wait(650);
+    this.scene.start('Treehouse', { stars: this.starsFound, totalStars: STARS.length, elapsed });
   }
 
   // ---------- every frame ----------

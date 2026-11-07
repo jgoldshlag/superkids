@@ -36,6 +36,10 @@ export default class Pigeon {
     return 38 * this.size;
   }
 
+  isDangerous() {
+    return this.state === 'telegraph' || this.state === 'dash' || this.state === 'flapWindup';
+  }
+
   setState(s) {
     this.state = s;
     this.stateTime = 0;
@@ -94,13 +98,13 @@ export default class Pigeon {
     this.scene.time.delayedCall(90, () => this.sprite.clearTint());
     if (!this.angry && this.hp <= this.maxHp / 2) {
       this.angry = true;
-      this.scene.onPigeonAngry();
+      this.scene.onBossAngry();
     }
     if (this.hp <= 0) {
       this.alive = false;
       this.ai = false;
       this.sprite.clearTint();
-      this.scene.onPigeonDefeated();
+      this.scene.onBossDefeated();
     }
   }
 
@@ -132,11 +136,11 @@ export default class Pigeon {
         break;
 
       case 'walk': {
-        const bread = s.nearestBread(this.x, this.y, 500);
+        const bread = s.nearestFood(this.x, this.y, 500);
         if (bread) {
           const d = this.moveToward(bread.x, bread.y, spd * 1.7, dt);
           if (d < this.radius * 0.6) {
-            s.pigeonEats(bread);
+            s.bossEats(bread);
             this.setState('eating');
           }
           break;
@@ -190,7 +194,7 @@ export default class Pigeon {
         const times = [200, 600, 1000];
         while (this.volleys < times.length && this.stateTime > times[this.volleys]) {
           this.faceTo(e.x, e.y);
-          s.featherVolley(this.x, this.y, this.heading, Math.max(3, (this.angry ? 7 : 5) + this.diff.extraFeathers), this.radius);
+          s.shootVolley(this.x, this.y, this.heading, Math.max(3, (this.angry ? 7 : 5) + this.diff.extraFeathers), this.radius, 'feather');
           this.volleys++;
         }
         if (this.stateTime > 1300) this.setState('walk');
