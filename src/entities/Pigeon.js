@@ -3,13 +3,14 @@ import Phaser from 'phaser';
 // The pigeon from Level 1. It starts tiny, eats bread, and becomes a GIANT boss.
 // Attacks: peck-dash, wing-flap shockwave, feather shots.
 export default class Pigeon {
-  constructor(scene, x, y, bounds) {
+  constructor(scene, x, y, bounds, diff) {
     this.scene = scene;
+    this.diff = diff;
     this.shadow = scene.add.ellipse(x, y, 80, 34, 0x000000, 0.25).setDepth(2);
     this.sprite = scene.add.image(x, y, 'pigeon').setScale(0.5);
     this.bounds = bounds;
     this.size = 0.5;
-    this.maxHp = 200;
+    this.maxHp = diff.bossHp;
     this.hp = this.maxHp;
     this.ai = false;
     this.alive = true;
@@ -19,7 +20,7 @@ export default class Pigeon {
     this.heading = Math.PI; // facing left at the start
     this.bobT = 0;
     this.moving = false;
-    this.speed = 85;
+    this.speed = 85 * diff.bossSpeed;
     this.dashDir = new Phaser.Math.Vector2();
     this.volleys = 0;
   }
@@ -81,7 +82,7 @@ export default class Pigeon {
   }
 
   eat() {
-    this.hp = Math.min(this.maxHp, this.hp + 10);
+    this.hp = Math.min(this.maxHp, this.hp + this.diff.breadHeal);
     this.growTo(Math.min(3, this.size + 0.15), 400);
   }
 
@@ -141,7 +142,7 @@ export default class Pigeon {
         const d = Phaser.Math.Distance.Between(this.x, this.y, e.x, e.y);
         if (d > this.radius + 30) this.moveToward(e.x, e.y, spd, dt);
         else this.faceTo(e.x, e.y);
-        if (this.stateTime > (this.angry ? 1500 : 2300)) this.chooseAttack();
+        if (this.stateTime > (this.angry ? 1500 : 2300) * this.diff.attackWait) this.chooseAttack();
         break;
       }
 
@@ -152,14 +153,14 @@ export default class Pigeon {
       case 'telegraph':
         if (Math.floor(this.stateTime / 90) % 2 === 0) this.sprite.setTint(0xff7777);
         else this.sprite.clearTint();
-        if (this.stateTime > (this.angry ? 500 : 750)) {
+        if (this.stateTime > (this.angry ? 500 : 750) * Math.max(1, this.diff.attackWait)) {
           this.sprite.clearTint();
           this.setState('dash');
         }
         break;
 
       case 'dash': {
-        const sp = this.angry ? 650 : 560;
+        const sp = (this.angry ? 650 : 560) * this.diff.bossSpeed;
         const bx = this.x;
         const by = this.y;
         this.sprite.x += this.dashDir.x * sp * dt;
@@ -187,7 +188,7 @@ export default class Pigeon {
         const times = [200, 600, 1000];
         while (this.volleys < times.length && this.stateTime > times[this.volleys]) {
           this.faceTo(e.x, e.y);
-          s.featherVolley(this.x, this.y, this.heading, this.angry ? 7 : 5, this.radius);
+          s.featherVolley(this.x, this.y, this.heading, Math.max(3, (this.angry ? 7 : 5) + this.diff.extraFeathers), this.radius);
           this.volleys++;
         }
         if (this.stateTime > 1300) this.setState('walk');

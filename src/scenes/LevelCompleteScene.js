@@ -50,7 +50,7 @@ export default class LevelCompleteScene extends Phaser.Scene {
     const secs = Math.round((data.time || 0) / 1000);
     const time = `${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, '0')}`;
     this.add
-      .text(W / 2, 460, `Bread grabbed: ${data.bread}     Time: ${time}`, { fontFamily: 'Arial', fontSize: '28px', color: '#9be7ff' })
+      .text(W / 2, 460, `${data.difficulty}     Bread grabbed: ${data.bread}     Time: ${time}`, { fontFamily: 'Arial', fontSize: '28px', color: '#9be7ff' })
       .setOrigin(0.5);
 
     makeButton(this, W / 2 - 170, 580, 'Play Again', () => this.scene.start('Level1'));

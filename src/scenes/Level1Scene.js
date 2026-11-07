@@ -6,6 +6,7 @@ import Pigeon from '../entities/Pigeon.js';
 import Controls from '../Controls.js';
 import Dialog from '../ui/Dialog.js';
 import { makeButton } from '../ui/button.js';
+import { getDifficulty } from '../data/difficulty.js';
 
 const WORLD_W = 1600;
 const WORLD_H = 1200;
@@ -24,6 +25,7 @@ export default class Level1Scene extends Phaser.Scene {
 
   create() {
     createArt(this);
+    this.diff = getDifficulty(this);
     this.physics.world.setBounds(0, 0, WORLD_W, WORLD_H);
     this.obstacles = this.physics.add.staticGroup();
 
@@ -34,11 +36,12 @@ export default class Level1Scene extends Phaser.Scene {
     this.addBlocker(520, 418, 100, 30);
     this.man = this.add.image(520, 392, 'char-man').setDepth(400);
 
-    this.pigeon = new Pigeon(this, 640, 500, new Phaser.Geom.Rectangle(130, 330, WORLD_W - 260, WORLD_H - 450));
+    this.pigeon = new Pigeon(this, 640, 500, new Phaser.Geom.Rectangle(130, 330, WORLD_W - 260, WORLD_H - 450), this.diff);
 
     this.kids = KIDS.map((def, i) => new Kid(this, 760 + i * 70, 1010, def, def.id === 'elin'));
     this.elin = this.kids[0];
     this.bots = this.kids.slice(1);
+    this.elin.maxHp = this.elin.hp = this.diff.elinHearts;
     for (const k of this.kids) this.physics.add.collider(k.sprite, this.obstacles);
 
     this.breads = [];
@@ -188,6 +191,11 @@ export default class Level1Scene extends Phaser.Scene {
       .setDepth(9500);
 
     const bw = 420;
+    this.add
+      .text(16, 54, this.diff.label, { fontFamily: 'Arial Black, Arial', fontSize: '16px', color: colorHex(this.diff.color), stroke: '#000', strokeThickness: 4 })
+      .setScrollFactor(0)
+      .setDepth(9500);
+
     this.bossBar = this.add.container(W / 2, 0).setDepth(9500).setVisible(false);
     const name = this.add
       .text(0, 16, 'GIANT PIGEON', { fontFamily: 'Arial Black, Arial', fontSize: '20px', color: '#ffffff', stroke: '#000', strokeThickness: 4 })
@@ -438,7 +446,7 @@ export default class Level1Scene extends Phaser.Scene {
       this.tweens.add({ targets: k.sprite, y: k.y - 30, duration: 220, yoyo: true, repeat: 3, delay: i * 90 })
     );
     await this.say(olivia, 'Yay! On to the next adventure!');
-    this.scene.start('LevelComplete', { level: 1, bread: this.breadCollected, time: elapsed });
+    this.scene.start('LevelComplete', { level: 1, bread: this.breadCollected, time: elapsed, difficulty: this.diff.label });
   }
 
   onElinDown() {
@@ -513,7 +521,7 @@ export default class Level1Scene extends Phaser.Scene {
     bot.walkToward(p.x + Math.cos(a) * r, p.y + Math.sin(a) * r, 12);
     if (!danger && Phaser.Math.Distance.Between(bot.x, bot.y, p.x, p.y) < p.radius + 40) {
       bot.faceToward(p.x, p.y);
-      bot.punch(p, 2, Phaser.Math.Between(900, 1300));
+      bot.punch(p, this.diff.botDamage, Phaser.Math.Between(900, 1300));
     }
   }
 }
