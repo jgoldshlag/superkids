@@ -94,7 +94,7 @@ export default class Kid {
     if (target && target.alive && Phaser.Math.Distance.Between(px, py, target.x, target.y) < target.radius + 28) {
       target.damage(damage, this);
       sfx('punch');
-      this.scene.popText(px, py - 20, Phaser.Utils.Array.GetRandom(POW_WORDS), this.def.cape);
+      this.scene.popText(px, py - 20, Phaser.Utils.Array.GetRandom(this.def.weapon?.words ?? POW_WORDS), this.def.cape);
       return true;
     }
     sfx('swing');
@@ -117,6 +117,16 @@ export default class Kid {
   hit(fromX, fromY, power = 380) {
     const now = this.scene.time.now;
     if (now < this.invulnUntil || this.dizzy) return false;
+    // Jay's egg shield blocks a hit every few seconds
+    if (this.def.weapon?.shield && now >= (this.shieldReadyAt || 0)) {
+      this.shieldReadyAt = now + 5000;
+      this.invulnUntil = now + 600;
+      sfx('block');
+      this.scene.popText(this.x, this.y - 50, 'BLOCKED!', 0xffc107, 22);
+      const bubble = this.scene.add.circle(this.x, this.y, 40, 0xfffaf0, 0.35).setStrokeStyle(4, 0xffc107).setDepth(this.y + 2);
+      this.scene.tweens.add({ targets: bubble, scale: 1.4, alpha: 0, duration: 400, onComplete: () => bubble.destroy() });
+      return true;
+    }
     this.hp -= 1;
     sfx('hurt');
     this.invulnUntil = now + 1100;

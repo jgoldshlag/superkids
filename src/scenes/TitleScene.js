@@ -48,6 +48,9 @@ export default class TitleScene extends Phaser.Scene {
       this.add
         .text(x, 455, k.name, { fontFamily: 'Arial', fontSize: '24px', fontStyle: 'bold', color: '#ffffff' })
         .setOrigin(0.5);
+      this.add
+        .text(x, 482, k.weapon.name, { fontFamily: 'Arial', fontSize: '15px', color: '#9be7ff' })
+        .setOrigin(0.5);
     });
 
     this.add

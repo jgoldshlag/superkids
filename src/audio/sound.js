@@ -307,6 +307,21 @@ const SFX = {
     tone(sfxBus, 'sine', 2750, t, 0.5, 0.12);
   },
   happy: (t) => ['C5', 'E5', 'G5', 'E5', 'C6'].forEach((n, i) => tone(sfxBus, 'triangle', freq(n), t + i * 0.1, 0.15, 0.3)),
+  zap: (t) => tone(sfxBus, 'square', 600, t, 0.1, 0.12, { slideTo: 1600 }),
+  ice: (t) => {
+    tone(sfxBus, 'triangle', 1800, t, 0.12, 0.2, { slideTo: 2600 });
+    tone(sfxBus, 'sine', 3200, t + 0.05, 0.15, 0.1);
+  },
+  egg: (t) => tone(sfxBus, 'sine', 500, t, 0.08, 0.3, { slideTo: 250 }),
+  splat: (t) => noise(sfxBus, t, 0.15, 0.35, { type: 'lowpass', freq: 1200, slideTo: 300 }),
+  hack: (t) => {
+    for (let i = 0; i < 8; i++) tone(sfxBus, 'square', 400 + Math.random() * 1200, t + i * 0.06, 0.05, 0.12);
+    tone(sfxBus, 'sawtooth', 200, t + 0.5, 0.4, 0.15, { slideTo: 60 });
+  },
+  block: (t) => {
+    tone(sfxBus, 'square', 1200, t, 0.08, 0.15);
+    tone(sfxBus, 'triangle', 900, t, 0.2, 0.2);
+  },
   fight: (t) => ['G4', 'C5', 'E5', 'G5'].forEach((n, i) => tone(sfxBus, 'square', freq(n), t + i * 0.08, i === 3 ? 0.35 : 0.08, 0.18)),
 };
 

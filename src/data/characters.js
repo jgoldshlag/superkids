@@ -11,6 +11,8 @@ export const KIDS = [
     cape: 0x9b5de5,
     shirt: 0xb47ced,
     pants: 0x2d3047,
+    // A watch that knows every tech code in the world. Special: HACK the boss!
+    weapon: { id: 'watch', name: 'Tech Watch', shot: 'laser', words: ['ZAP!', 'BEEP!', 'BZZT!'], sound: 'zap' },
   },
   {
     id: 'olivia',
@@ -22,6 +24,8 @@ export const KIDS = [
     cape: 0xf15bb5,
     shirt: 0xf78bd0,
     pants: 0x2d3047,
+    // Trident with ice powers: ice blasts slow the boss down.
+    weapon: { id: 'trident', name: 'Ice Trident', shot: 'icebolt', words: ['ICE!', 'FREEZE!', 'BRRR!'], sound: 'ice', effect: 'freeze' },
   },
   {
     id: 'reese',
@@ -33,6 +37,8 @@ export const KIDS = [
     cape: 0x00a6ed,
     shirt: 0x4cc3f5,
     pants: 0x2d3047,
+    // Fireballs + a sword that can cut through anything (extra strong up close).
+    weapon: { id: 'sword', name: 'Fireballs + Sword', shot: 'kidfire', words: ['SLASH!', 'SWISH!', 'FWOOSH!'], sound: 'fire', meleeBonus: 2 },
   },
   {
     id: 'jay',
@@ -44,6 +50,8 @@ export const KIDS = [
     cape: 0x2ec46d,
     shirt: 0x5fd98f,
     pants: 0x2d3047,
+    // Egg shield blocks hits, and throwing eggs. SPLAT!
+    weapon: { id: 'eggshield', name: 'Egg Shield + Eggs', shot: 'egg', words: ['SPLAT!', 'EGGED!', 'YOLK!'], sound: 'egg', shield: true },
   },
 ];
 

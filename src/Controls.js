@@ -14,6 +14,7 @@ export default class Controls {
     this.joystick.enabled = false;
     this.joystick.anywhere = !attack;
     this.attackPointer = null;
+    this.specialPressed = false;
     this.isTouch = scene.sys.game.device.input.touch;
 
     const { width, height } = scene.scale;
@@ -30,8 +31,31 @@ export default class Controls {
       .setDepth(9501)
       .setVisible(false);
 
+    // Elin's special: HACK (keyboard E or K, or the watch button)
+    this.special = scene.add
+      .circle(width - 110, height - 255, 50, 0x00bcd4, 0.6)
+      .setStrokeStyle(4, 0xffffff, 0.85)
+      .setScrollFactor(0)
+      .setDepth(9500)
+      .setVisible(false);
+    this.specialText = scene.add
+      .text(width - 110, height - 255, 'HACK', { fontFamily: 'Arial Black, Arial', fontSize: '20px', color: '#ffffff' })
+      .setOrigin(0.5)
+      .setScrollFactor(0)
+      .setDepth(9501)
+      .setVisible(false);
+    const pressSpecial = () => {
+      if (this.enabled && this.hasAttack) this.specialPressed = true;
+    };
+    scene.input.keyboard?.on('keydown-E', pressSpecial);
+    scene.input.keyboard?.on('keydown-K', pressSpecial);
+
     scene.input.on('pointerdown', (p) => {
       if (!this.enabled || !this.hasAttack || p.x <= width / 2) return;
+      if (this.isTouch && Math.hypot(p.x - this.special.x, p.y - this.special.y) < 60) {
+        pressSpecial();
+        return;
+      }
       this.attackPointer = p;
       this.button.setScale(0.9);
     });
@@ -49,6 +73,8 @@ export default class Controls {
     this.joystick.enabled = on;
     this.button.setVisible(on && this.isTouch && this.hasAttack);
     this.buttonText.setVisible(on && this.isTouch && this.hasAttack);
+    this.special.setVisible(on && this.isTouch && this.hasAttack);
+    this.specialText.setVisible(on && this.isTouch && this.hasAttack);
     if (!on) {
       this.attackPointer = null;
       this.joystick.release();
@@ -68,6 +94,18 @@ export default class Controls {
     }
     if (v.length() > 1) v.normalize();
     return v;
+  }
+
+  // true once per press
+  consumeSpecial() {
+    const p = this.specialPressed;
+    this.specialPressed = false;
+    return p && this.enabled;
+  }
+
+  setSpecialLabel(text, ready) {
+    this.specialText.setText(text);
+    this.special.setFillStyle(ready ? 0x00bcd4 : 0x546e7a, 0.6);
   }
 
   get attackHeld() {

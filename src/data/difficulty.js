@@ -4,7 +4,7 @@ export const DIFFICULTIES = {
     label: 'Easy',
     color: 0x2ec46d,
     elinHearts: 8,
-    bossHp: 150,
+    bossHp: 260,
     bossSpeed: 0.8, // how fast the boss moves
     attackWait: 1.4, // bigger = more time between boss attacks
     extraFeathers: -2,
@@ -15,7 +15,7 @@ export const DIFFICULTIES = {
     label: 'Medium',
     color: 0xf2a33a,
     elinHearts: 6,
-    bossHp: 200,
+    bossHp: 380,
     bossSpeed: 1,
     attackWait: 1,
     extraFeathers: 0,
@@ -26,7 +26,7 @@ export const DIFFICULTIES = {
     label: 'Hard',
     color: 0xe5383b,
     elinHearts: 5,
-    bossHp: 260,
+    bossHp: 500,
     bossSpeed: 1.2,
     attackWait: 0.75,
     extraFeathers: 2,

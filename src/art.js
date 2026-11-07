@@ -49,6 +49,28 @@ export function drawPerson(g, o) {
   g.fillStyle(o.skin, 1);
   g.fillCircle(12.5, 46, 3.5);
   g.fillCircle(35.5, 46, 3.5);
+  // weapons
+  const w = o.weapon?.id;
+  if (w === 'trident') {
+    g.lineStyle(2.5, 0xd4a017, 1).lineBetween(37, 52, 42, 6);
+    g.lineStyle(2.5, 0x8fe3ff, 1).lineBetween(36, 10, 37, 2).lineBetween(42, 6, 42.5, 0).lineBetween(47, 10, 47.5, 3).lineBetween(36, 10, 47, 10);
+  }
+  if (w === 'sword') {
+    g.fillStyle(0xd9e2ec, 1).fillTriangle(36, 40, 40, 40, 39, 4);
+    g.lineStyle(1, 0xffffff, 1).lineBetween(38, 38, 39, 8);
+    g.fillStyle(0x8d5a2b, 1).fillRect(33, 40, 10, 3);
+    g.fillStyle(0xd7263d, 1).fillRect(36.5, 43, 3, 5);
+  }
+  if (w === 'watch') {
+    g.fillStyle(0x222222, 1).fillRect(9, 41, 7, 4);
+    g.fillStyle(0x00e5ff, 1).fillRoundedRect(9.5, 39.5, 6, 6, 1.5);
+    g.fillStyle(0xffffff, 0.8).fillRect(11, 41, 1.5, 1.5);
+  }
+  if (w === 'eggshield') {
+    g.fillStyle(0xfffaf0, 1).fillEllipse(9, 41, 16, 20);
+    g.lineStyle(1.5, 0xd9cfb8, 1).strokeEllipse(9, 41, 16, 20);
+    g.fillStyle(0xffc107, 1).fillCircle(9, 42, 4.5);
+  }
   // ears + head
   g.fillStyle(o.skin, 1);
   g.fillCircle(11, 21, 3);
@@ -215,6 +237,34 @@ export function createArt(scene) {
   g.arc(8, 22, 18, -1.1, 1.1, false);
   g.strokePath();
   g.generateTexture('swoosh', 32, 44);
+  g.destroy();
+
+  // weapon shots
+  g = gfx(scene);
+  g.fillStyle(0x00e5ff, 0.5).fillRoundedRect(0, 0, 28, 10, 5);
+  g.fillStyle(0xffffff, 1).fillRoundedRect(4, 3, 20, 4, 2);
+  g.generateTexture('laser', 28, 10);
+  g.destroy();
+  g = gfx(scene);
+  g.fillStyle(0x8fe3ff, 1).fillPoints([{ x: 0, y: 7 }, { x: 10, y: 0 }, { x: 28, y: 7 }, { x: 10, y: 14 }], true);
+  g.fillStyle(0xffffff, 0.8).fillPoints([{ x: 6, y: 7 }, { x: 11, y: 4 }, { x: 20, y: 7 }, { x: 11, y: 10 }], true);
+  g.generateTexture('icebolt', 28, 14);
+  g.destroy();
+  g = gfx(scene);
+  g.fillStyle(0xff3d00, 0.5).fillCircle(12, 12, 11);
+  g.fillStyle(0xff9100, 1).fillCircle(12, 12, 8);
+  g.fillStyle(0xffe082, 1).fillCircle(13, 11, 4);
+  g.generateTexture('kidfire', 24, 24);
+  g.destroy();
+  g = gfx(scene);
+  g.fillStyle(0xfffaf0, 1).fillEllipse(9, 11, 16, 20);
+  g.lineStyle(1.5, 0xd9cfb8, 1).strokeEllipse(9, 11, 16, 20);
+  g.generateTexture('egg', 18, 22);
+  g.destroy();
+  g = gfx(scene);
+  g.fillStyle(0xffffff, 1).fillCircle(16, 14, 11).fillCircle(7, 9, 5).fillCircle(26, 8, 5).fillCircle(27, 20, 4).fillCircle(6, 21, 4);
+  g.fillStyle(0xffc107, 1).fillCircle(16, 14, 6);
+  g.generateTexture('splat', 34, 28);
   g.destroy();
 
   // star (for dizzy)
