@@ -56,12 +56,18 @@ export function drawPerson(g, o) {
   g.fillCircle(24, 20, 13);
   // hair on top
   g.fillStyle(o.hair, 1);
-  g.beginPath();
-  g.arc(24, 19, 14, Math.PI, Math.PI * 2, false);
-  g.closePath();
-  g.fillPath();
-  g.fillEllipse(19, 11, 18, 10);
-  g.fillEllipse(30, 11, 16, 9);
+  if (o.hairStyle === 'bald') {
+    g.fillEllipse(12, 17, 7, 12);
+    g.fillEllipse(36, 17, 7, 12);
+    g.fillStyle(0xffffff, 0.25).fillEllipse(20, 10, 8, 4); // shiny head
+  } else {
+    g.beginPath();
+    g.arc(24, 19, 14, Math.PI, Math.PI * 2, false);
+    g.closePath();
+    g.fillPath();
+    g.fillEllipse(19, 11, 18, 10);
+    g.fillEllipse(30, 11, 16, 9);
+  }
   if (o.hat) {
     g.fillStyle(o.hat, 1);
     g.fillEllipse(24, 9, 30, 14);
@@ -83,9 +89,30 @@ export function drawPerson(g, o) {
   g.fillCircle(15.5, 26, 2.5);
   g.fillCircle(32.5, 26, 2.5);
   g.lineStyle(1.6, 0x7a3b2e, 1);
-  g.beginPath();
-  g.arc(24, 26, 3.5, 0.15 * Math.PI, 0.85 * Math.PI, false);
-  g.strokePath();
+  if (o.mood === 'mean') {
+    // angry eyebrows + frown
+    g.lineStyle(2.2, 0x3a2a20, 1).lineBetween(16, 17, 22, 19.5).lineBetween(32, 17, 26, 19.5);
+    g.lineStyle(1.6, 0x7a3b2e, 1);
+    g.beginPath();
+    g.arc(24, 30, 3.5, 1.2 * Math.PI, 1.8 * Math.PI, false);
+    g.strokePath();
+  } else if (o.mood === 'meh') {
+    g.lineStyle(2, 0x3a2a20, 1).lineBetween(16, 18, 22, 18.5).lineBetween(32, 18, 26, 18.5);
+    g.lineStyle(1.6, 0x7a3b2e, 1).lineBetween(21, 27.5, 27, 27.5);
+  } else {
+    g.beginPath();
+    g.arc(24, 26, 3.5, 0.15 * Math.PI, 0.85 * Math.PI, false);
+    g.strokePath();
+  }
+  if (o.glasses) {
+    g.lineStyle(1.3, 0x222222, 1).strokeCircle(19.5, 22, 4.2).strokeCircle(28.5, 22, 4.2).lineBetween(23.7, 22, 24.3, 22);
+  }
+  if (o.tie) {
+    g.fillStyle(o.tie, 1).fillTriangle(22, 31, 26, 31, 24, 34).fillTriangle(22.5, 33, 25.5, 33, 24, 45);
+  }
+  if (o.mustache) {
+    g.fillStyle(o.hair, 1).fillEllipse(24, 27.5, 10, 3.5);
+  }
   if (o.id === 'man') {
     g.fillStyle(o.hair, 1);
     g.fillEllipse(24, 27.5, 10, 3.5); // mustache

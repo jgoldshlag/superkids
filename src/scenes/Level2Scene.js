@@ -21,7 +21,7 @@ const STARS = [
   [2400, 120], [560, 1250], [1300, 1250], [2220, 1180], [3180, 1250],
 ];
 
-// LEVEL 2 (designed by Elin): Find Olivia's treehouse on Freeman Street. No enemies!
+// LEVEL 2 (designed by Elin): Find Olivia's treehouse on Olivia's street. No enemies!
 export default class Level2Scene extends BaseLevel {
   constructor() {
     super('Level2');
@@ -67,7 +67,7 @@ export default class Level2Scene extends BaseLevel {
   // ---------- the street ----------
 
   drawStreet() {
-    const rnd = new Phaser.Math.RandomDataGenerator(['freeman-st']);
+    const rnd = new Phaser.Math.RandomDataGenerator(['olivias-st']);
     const g = this.add.graphics().setDepth(0);
     // lawns
     g.fillStyle(0x7ccf5a, 1).fillRect(0, 0, W, H);
@@ -115,7 +115,7 @@ export default class Level2Scene extends BaseLevel {
     g.fillStyle(0x1e7d3a, 1).fillRoundedRect(x - 70, y - 60, 140, 34, 5);
     g.lineStyle(2, 0xffffff, 1).strokeRoundedRect(x - 66, y - 56, 132, 26, 4);
     this.add
-      .text(x, y - 43, 'Freeman St', { fontFamily: 'Arial', fontSize: '20px', fontStyle: 'bold', color: '#ffffff' })
+      .text(x, y - 43, "Olivia's St", { fontFamily: 'Arial', fontSize: '20px', fontStyle: 'bold', color: '#ffffff' })
       .setOrigin(0.5)
       .setDepth(y + 41);
     this.addBlocker(x, y + 36, 14, 10);
@@ -231,7 +231,7 @@ export default class Level2Scene extends BaseLevel {
       {
         sprite: mk(720, 662, 'char-mail'),
         lines: [
-          [NEIGHBORS.mail, "Hi kids! Looking for Olivia's house? It's way down Freeman Street. Keep walking that way!"],
+          [NEIGHBORS.mail, "Hi kids! Looking for Olivia's house? It's way down this street. Keep walking that way!"],
           [jay, 'Thanks!'],
         ],
       },
@@ -310,7 +310,7 @@ export default class Level2Scene extends BaseLevel {
     const [elin, olivia, reese, jay] = KIDS;
     await this.say(olivia, 'Hey everyone! Guess what? I have a brand new TREEHOUSE!');
     await this.say(jay, 'Whoa! Where is it?');
-    await this.say(olivia, "It's at my house on Freeman Street. But it's SUPER hidden. Bet you can't find it!");
+    await this.say(olivia, "It's at my house, down this street. But it's SUPER hidden. Bet you can't find it!");
     await this.say(olivia, 'See you there! Hee hee!');
 
     // Olivia runs ahead and disappears

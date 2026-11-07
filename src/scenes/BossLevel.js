@@ -152,12 +152,17 @@ export default class BossLevel extends BaseLevel {
     sfx('shoot');
     for (let i = 0; i < n; i++) {
       const a = angle + (i - (n - 1) / 2) * spread;
-      const f = this.projectiles.create(x + Math.cos(a) * r * 0.8, y + Math.sin(a) * r * 0.8, texture);
-      f.setRotation(a).setDepth(8500);
-      this.physics.velocityFromRotation(a, speed, f.body.velocity);
-      if (spin) f.setAngularVelocity(600);
-      f.born = this.time.now;
+      this.spawnProjectile(x + Math.cos(a) * r * 0.8, y + Math.sin(a) * r * 0.8, a, texture, speed, spin);
     }
+  }
+
+  spawnProjectile(x, y, angle, texture, speed = 300, spin = false) {
+    const f = this.projectiles.create(x, y, texture);
+    f.setRotation(angle).setDepth(8500);
+    this.physics.velocityFromRotation(angle, speed, f.body.velocity);
+    if (spin) f.setAngularVelocity(600);
+    f.born = this.time.now;
+    return f;
   }
 
   // ---------- fight flow ----------

@@ -296,6 +296,17 @@ const SFX = {
   click: (t) => tone(sfxBus, 'square', 660, t, 0.05, 0.12),
   talk: (t) => tone(sfxBus, 'triangle', 520 + Math.random() * 200, t, 0.05, 0.15),
   toss: (t) => tone(sfxBus, 'sine', 300, t, 0.25, 0.2, { slideTo: 700 }),
+  fire: (t) => noise(sfxBus, t, 0.3, 0.35, { type: 'lowpass', freq: 900, slideTo: 300 }),
+  roar: (t) => {
+    tone(sfxBus, 'sawtooth', 90, t, 0.9, 0.35, { slideTo: 55 });
+    tone(sfxBus, 'square', 140, t, 0.9, 0.12, { slideTo: 70 });
+    noise(sfxBus, t, 0.9, 0.3, { type: 'lowpass', freq: 600 });
+  },
+  whistle: (t) => {
+    tone(sfxBus, 'sine', 2600, t, 0.5, 0.2);
+    tone(sfxBus, 'sine', 2750, t, 0.5, 0.12);
+  },
+  happy: (t) => ['C5', 'E5', 'G5', 'E5', 'C6'].forEach((n, i) => tone(sfxBus, 'triangle', freq(n), t + i * 0.1, 0.15, 0.3)),
   fight: (t) => ['G4', 'C5', 'E5', 'G5'].forEach((n, i) => tone(sfxBus, 'square', freq(n), t + i * 0.08, i === 3 ? 0.35 : 0.08, 0.18)),
 };
 

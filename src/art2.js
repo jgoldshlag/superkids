@@ -1,4 +1,4 @@
-// Art for Level 2 (Freeman Street): houses, cars, treehouse, dog, neighbors.
+// Art for Level 2 (Olivia's street): houses, cars, treehouse, dog, neighbors.
 import { drawPerson } from './art.js';
 
 export const NEIGHBORS = {
