@@ -42,7 +42,11 @@ export default class Dialog {
       this.nameText.setText(name).setColor(color);
       const x = portraitKey ? 170 : 50;
       this.portrait.setVisible(!!portraitKey);
-      if (portraitKey) this.portrait.setTexture(portraitKey);
+      if (portraitKey) {
+        this.portrait.setTexture(portraitKey);
+        // big bosses get shrunk so they fit in the box
+        this.portrait.setScale(Math.min(1.9, 130 / this.portrait.height, 130 / this.portrait.width));
+      }
       this.nameText.x = x;
       this.bodyText.x = x;
       this.bodyText.setWordWrapWidth(this.W - x - 60);

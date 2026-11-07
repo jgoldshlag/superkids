@@ -5,9 +5,9 @@ export const LEVELS = [
   { name: 'The Chubby Bunny', scene: 'Level3' },
   { name: 'The School Dragon', scene: 'Level4' },
   { name: 'The Grumpy Principal', scene: 'Level5' },
-  { name: '?' },
-  { name: '?' },
-  { name: '?' },
+  { name: 'The Super Robot', scene: 'Level6' },
+  { name: 'The Heart Boss', scene: 'Level7' },
+  { name: 'The Bad Dream', scene: 'Level8' },
   { name: '?' },
   { name: '?' },
 ];

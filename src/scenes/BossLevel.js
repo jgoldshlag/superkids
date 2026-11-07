@@ -152,7 +152,7 @@ export default class BossLevel extends BaseLevel {
     const now = this.time.now;
     if (now < this.hackReadyAt || !this.boss.alive) return;
     this.hackReadyAt = now + 12000;
-    this.bossStunUntil = now + 3000;
+    this.bossStunUntil = now + (this.hackStunMs ?? 3000);
     const b = this.boss;
     sfx('hack');
     this.projectiles.clear(true, true);
@@ -320,7 +320,9 @@ export default class BossLevel extends BaseLevel {
       const e = this.elin;
       const b = this.boss;
       const v = this.controls.moveVector;
-      e.walk(v.x, v.y);
+      // the Bad Dream monster can twist your mind: controls go BACKWARDS
+      if (time < (this.confuseUntil || 0)) e.walk(-v.x, -v.y);
+      else e.walk(v.x, v.y);
       if (this.controls.attackHeld) {
         // up close: punch. Farther away: Tech Watch laser!
         const d = Phaser.Math.Distance.Between(e.x, e.y, b.x, b.y);

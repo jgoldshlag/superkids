@@ -169,6 +169,17 @@ const TRACKS = {
     },
     drums: { kick: 'x...x...', snare: '........', hat: '.x.x.x.x' },
   },
+  // Slow, spooky dream music
+  dream: {
+    bpm: 84,
+    lead: {
+      type: 'triangle',
+      vol: 0.3,
+      bars: ['E5 - G5 - B5 - A5 -', 'G5 - F#5 - E5 - - -', 'C5 - E5 - G5 - F#5 -', 'D#5 - - - B4 - - -'],
+    },
+    bass: { type: 'sine', vol: 0.5, bars: ['E2 - - - - - - -', 'E2 - - - - - - -', 'C2 - - - - - - -', 'B1 - - - - - - -'] },
+    drums: { kick: 'x.......', snare: '........', hat: '....x...' },
+  },
   // Short victory fanfare (doesn't loop)
   win: {
     bpm: 150,
@@ -323,6 +334,31 @@ const SFX = {
     tone(sfxBus, 'triangle', 900, t, 0.2, 0.2);
   },
   fight: (t) => ['G4', 'C5', 'E5', 'G5'].forEach((n, i) => tone(sfxBus, 'square', freq(n), t + i * 0.08, i === 3 ? 0.35 : 0.08, 0.18)),
+  beep: (t) => {
+    tone(sfxBus, 'square', 880, t, 0.08, 0.12);
+    tone(sfxBus, 'square', 660, t + 0.1, 0.1, 0.12);
+  },
+  beam: (t) => {
+    tone(sfxBus, 'sawtooth', 1400, t, 0.7, 0.12, { slideTo: 900 });
+    tone(sfxBus, 'square', 2100, t, 0.7, 0.05);
+  },
+  heartbeat: (t) => {
+    tone(sfxBus, 'sine', 70, t, 0.12, 0.7, { slideTo: 45 });
+    tone(sfxBus, 'sine', 70, t + 0.22, 0.12, 0.5, { slideTo: 45 });
+  },
+  boing: (t) => tone(sfxBus, 'triangle', 200, t, 0.35, 0.3, { slideTo: 700 }),
+  drip: (t) => tone(sfxBus, 'sine', 1200, t, 0.12, 0.25, { slideTo: 400 }),
+  spooky: (t) => {
+    tone(sfxBus, 'sine', 300, t, 1.2, 0.2, { slideTo: 180 });
+    tone(sfxBus, 'triangle', 310, t, 1.2, 0.15, { slideTo: 170 });
+  },
+  siren: (t) => {
+    for (let i = 0; i < 4; i++) {
+      tone(sfxBus, 'triangle', 700, t + i * 0.5, 0.25, 0.18, { slideTo: 950 });
+      tone(sfxBus, 'triangle', 950, t + i * 0.5 + 0.25, 0.25, 0.18, { slideTo: 700 });
+    }
+  },
+  twinkle: (t) => ['E6', 'G6', 'B6', 'E7', 'B6', 'G6'].forEach((n, i) => tone(sfxBus, 'triangle', freq(n), t + i * 0.07, 0.15, 0.2)),
 };
 
 export function sfx(name) {
