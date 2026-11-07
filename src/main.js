@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import TitleScene from './scenes/TitleScene.js';
-import GameScene from './scenes/GameScene.js';
+import Level1Scene from './scenes/Level1Scene.js';
+import LevelCompleteScene from './scenes/LevelCompleteScene.js';
 
 const config = {
   type: Phaser.AUTO,
@@ -12,12 +13,12 @@ const config = {
     width: 1024,
     height: 768, // 4:3 matches the iPad screen
   },
-  input: { activePointers: 3 }, // multi-touch: move + attack at the same time
+  input: { activePointers: 3 }, // multi-touch: move + punch at the same time
   physics: {
     default: 'arcade',
     arcade: { gravity: { x: 0, y: 0 }, debug: false },
   },
-  scene: [TitleScene, GameScene],
+  scene: [TitleScene, Level1Scene, LevelCompleteScene],
 };
 
-new Phaser.Game(config);
+window.__game = new Phaser.Game(config);

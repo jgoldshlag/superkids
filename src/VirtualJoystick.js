@@ -5,15 +5,16 @@ export default class VirtualJoystick {
     this.scene = scene;
     this.radius = radius;
     this.pointer = null;
+    this.enabled = true;
     this.x = 0;
     this.y = 0;
 
     this.base = scene.add.circle(0, 0, radius, 0xffffff, 0.15).setStrokeStyle(4, 0xffffff, 0.4);
     this.knob = scene.add.circle(0, 0, radius * 0.45, 0xffffff, 0.4);
-    for (const o of [this.base, this.knob]) o.setScrollFactor(0).setDepth(1000).setVisible(false);
+    for (const o of [this.base, this.knob]) o.setScrollFactor(0).setDepth(9500).setVisible(false);
 
     scene.input.on('pointerdown', (p) => {
-      if (this.pointer || p.x > scene.scale.width / 2) return;
+      if (!this.enabled || this.pointer || p.x > scene.scale.width / 2) return;
       this.pointer = p;
       this.base.setPosition(p.x, p.y).setVisible(true);
       this.knob.setPosition(p.x, p.y).setVisible(true);
@@ -29,14 +30,17 @@ export default class VirtualJoystick {
       this.y = (Math.sin(ang) * dist) / radius;
     });
     const release = (p) => {
-      if (p !== this.pointer) return;
-      this.pointer = null;
-      this.x = this.y = 0;
-      this.base.setVisible(false);
-      this.knob.setVisible(false);
+      if (p === this.pointer) this.release();
     };
     scene.input.on('pointerup', release);
     scene.input.on('pointerupoutside', release);
+  }
+
+  release() {
+    this.pointer = null;
+    this.x = this.y = 0;
+    this.base.setVisible(false);
+    this.knob.setVisible(false);
   }
 
   get active() {
