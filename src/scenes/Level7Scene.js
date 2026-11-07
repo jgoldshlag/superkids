@@ -228,10 +228,11 @@ export default class Level7Scene extends BossLevel {
     const move = this.controls.isTouch ? 'Drag on the LEFT side to move. Tap POW! to attack.' : 'ARROW KEYS to move. SPACE to attack.';
     await this.dialog.show(
       'How to play',
-      `${move}\nThe Heart Boss copies your feelings! Attack a lot = ANGRY. Run far away = SCARED. Get hurt = SAD. Stay close and calm = HAPPY.\nWatch the feelings meter at the top!`,
+      `${move}\nThe Heart Boss copies your feelings!\nWatch the feelings meter at the top!`,
       null,
       '#9be7ff'
     );
+    await this.dialog.show('How to play', 'Attack a lot = ANGRY.   Run far away = SCARED.\nGet hurt = SAD.   Stay close and calm = HAPPY.', null, '#9be7ff');
     this.startFight();
   }
 

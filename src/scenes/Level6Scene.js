@@ -186,10 +186,11 @@ export default class Level6Scene extends BossLevel {
     const hack = this.controls.isTouch ? 'the HACK button' : 'E';
     await this.dialog.show(
       'How to play',
-      `${move}\nWhen you see a thin RED line, MOVE - a giant laser is coming!\nHACK (${hack}) freezes robots for extra long. Grab the batteries before the robot recharges!`,
+      `${move}\nWhen you see a thin RED line, MOVE!\nA giant laser is coming!`,
       null,
       '#9be7ff'
     );
+    await this.dialog.show('How to play', `HACK (${hack}) freezes robots for extra long.\nGrab the batteries before the robot recharges!`, null, '#9be7ff');
     r.py = Math.max(r.py, 380);
     this.startFight();
   }

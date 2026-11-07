@@ -337,10 +337,11 @@ export default class Level8Scene extends BossLevel {
     const move = this.controls.isTouch ? 'Drag on the LEFT side to move. Tap POW! to attack.' : 'ARROW KEYS to move. SPACE to attack.';
     await this.dialog.show(
       'How to play',
-      `${move}\nLIGHTS OUT: it sneaks up on you in the dark - keep moving!\nMIND TWIST makes your controls go BACKWARDS for a little bit.\nDon't let it steal the teddy bears!`,
+      `${move}\nDon't let it steal the teddy bears!`,
       null,
       '#9be7ff'
     );
+    await this.dialog.show('How to play', 'LIGHTS OUT: it sneaks up on you in the dark. Keep moving!\nMIND TWIST: your controls go BACKWARDS for a little bit.', null, '#9be7ff');
     this.startFight();
   }
 

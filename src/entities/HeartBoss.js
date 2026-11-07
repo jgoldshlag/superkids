@@ -33,7 +33,7 @@ export default class HeartBoss extends BaseBoss {
     this.feeling = s.readFeeling();
     const f = FEELINGS[this.feeling];
     sfx('heartbeat');
-    s.popText(this.px, this.py - 100, `I can feel it... you feel ${f.word}!`, f.color, 26);
+    s.popText(this.px, this.py - 100, `I can feel it...\nyou feel ${f.word}!`, f.color, 26);
     this.setState('sense');
   }
 
