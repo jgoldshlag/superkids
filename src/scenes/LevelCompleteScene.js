@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { createArt } from '../art.js';
 import { KIDS } from '../data/characters.js';
+import { LEVELS } from '../data/levels.js';
 import { makeButton } from '../ui/button.js';
 import { music } from '../audio/sound.js';
 
@@ -57,7 +58,7 @@ export default class LevelCompleteScene extends Phaser.Scene {
     } else {
       makeButton(this, W / 2 - 170, 580, 'Play Again', () => this.scene.start(data.replay));
       makeButton(this, W / 2 + 170, 580, 'Pick Level', () => this.scene.start('LevelSelect'), 0x4c6ef5);
-      const last = data.level >= 10;
+      const last = data.level >= LEVELS.length;
       this.add
         .text(W / 2, 680, last ? 'YOU BEAT THE WHOLE GAME! The SuperKids saved Arlington!' : `Level ${data.level + 1} coming soon!`, {
           fontFamily: last ? 'Arial Black, Arial' : 'Arial',

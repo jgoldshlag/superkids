@@ -1,4 +1,4 @@
-// Elin's 10 levels. Add a `scene` key when a level is built.
+// Elin's 30 levels. Add a `scene` key when a level is built.
 export const LEVELS = [
   { name: 'The Giant Pigeon', scene: 'Level1' },
   { name: "Olivia's Treehouse", scene: 'Level2' },
@@ -10,4 +10,24 @@ export const LEVELS = [
   { name: 'The Bad Dream', scene: 'Level8' },
   { name: 'The Zombie', scene: 'Level9' },
   { name: 'The Everything Boss', scene: 'Level10' },
+  { name: '?' },
+  { name: '?' },
+  { name: '?' },
+  { name: '?' },
+  { name: '?' },
+  { name: '?' },
+  { name: '?' },
+  { name: '?' },
+  { name: '?' },
+  { name: '?' },
+  { name: '?' },
+  { name: '?' },
+  { name: '?' },
+  { name: '?' },
+  { name: '?' },
+  { name: '?' },
+  { name: '?' },
+  { name: '?' },
+  { name: '?' },
+  { name: '?' },
 ];
