@@ -331,7 +331,7 @@ export default class Level10Scene extends BossLevel {
     this.levelComplete({
       level: 10,
       replay: 'Level10',
-      next: null,
+      next: 'Level11',
       subtitle: 'The Everything Boss is your friend now!',
       stats: `${this.diff.label}     Snacks grabbed: ${this.foodCollected}     Time: ${formatTime(elapsed)}`,
     });

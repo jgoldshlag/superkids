@@ -51,6 +51,9 @@ export default class LevelCompleteScene extends Phaser.Scene {
 
     this.add.text(W / 2, 460, data.stats, { fontFamily: 'Arial', fontSize: '28px', color: '#9be7ff' }).setOrigin(0.5);
 
+    // the next level = whatever level comes after this one in the list (if it's built)
+    const nextLevel = LEVELS[data.level];
+    if (nextLevel?.scene && this.scene.manager.keys[nextLevel.scene]) data.next = nextLevel.scene;
     if (data.next && this.scene.manager.keys[data.next]) {
       makeButton(this, W / 2, 560, 'Next Level!', () => this.scene.start(data.next), 0x2ec46d);
       makeButton(this, W / 2 - 170, 660, 'Play Again', () => this.scene.start(data.replay));
