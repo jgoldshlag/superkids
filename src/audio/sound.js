@@ -358,6 +358,11 @@ const SFX = {
       tone(sfxBus, 'triangle', 950, t + i * 0.5 + 0.25, 0.25, 0.18, { slideTo: 700 });
     }
   },
+  groan: (t) => {
+    tone(sfxBus, 'sawtooth', 110, t, 1.0, 0.25, { slideTo: 80 });
+    tone(sfxBus, 'square', 115, t + 0.05, 0.9, 0.08, { slideTo: 75 });
+  },
+  dig: (t) => noise(sfxBus, t, 0.2, 0.35, { type: 'lowpass', freq: 500, slideTo: 150 }),
   twinkle: (t) => ['E6', 'G6', 'B6', 'E7', 'B6', 'G6'].forEach((n, i) => tone(sfxBus, 'triangle', freq(n), t + i * 0.07, 0.15, 0.2)),
 };
 

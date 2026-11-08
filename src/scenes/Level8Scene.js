@@ -304,7 +304,8 @@ export default class Level8Scene extends BossLevel {
       this.bedElin.setVisible(true).setAngle(0);
       [oK, rK, jK].forEach((k, i) => k.sprite.setPosition(HOSP.x + 300 + i * 90, HOSP.y + 520));
     });
-    await this.doctorSays("I'm Dr. Nana. Don't worry - Elin is safe here in the hospital.");
+    await this.say(KIDS[1], "Look, it's Dr. Nana! She's Elin's GRANDMA!");
+    await this.doctorSays("Hi, kids. Don't worry - I'm taking extra good care of my granddaughter.");
     await this.doctorSays("She's in a very deep sleep. She's stuck inside a bad dream.");
     await this.say(jay, 'Is there anything we can do to help her?');
     await this.say(olivia, "Her Tech Watch! It knows every tech code in the world... even the code to go INTO a dream!");
@@ -391,7 +392,9 @@ export default class Level8Scene extends BossLevel {
     sfx('happy');
     await this.say(elin, '*yawn* ...Hi guys! I had the CRAZIEST dream... and you were all in it!');
     await this.say(olivia, 'ELIN! You woke up!');
-    await this.doctorSays("Look at that! Elin is all better. She can go home today!");
+    await this.say(elin, 'NANA! You were here the whole time!');
+    await this.doctorSays("Of course, sweetie. Grandmas always stay close. And look at that - you're all better!");
+    await this.doctorSays('You can go home today. Big hugs first!');
     music.play('win');
     this.bedElin.setVisible(false);
     this.showKid(eK, true);

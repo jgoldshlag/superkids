@@ -163,9 +163,9 @@ const TEACHER = {
 const DOCTOR = {
   id: 'doctor',
   name: 'Dr. Nana',
-  skin: 0x8d5524,
-  hair: 0x1a1a1a,
-  hairStyle: 'short',
+  skin: 0xf6d3bb, // white
+  hair: 0xf2d16b, // blonde
+  hairStyle: 'medium',
   eyes: 0x3b2210,
   shirt: 0xffffff,
   pants: 0x4fc3f7,
