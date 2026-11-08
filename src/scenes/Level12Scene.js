@@ -2,16 +2,18 @@ import Phaser from 'phaser';
 import { createArt } from '../art.js';
 import { createLevel2Art } from '../art2.js';
 import { createLevel678Art } from '../art678.js';
-import { createLevel12Art, CLAUDE_KID } from '../art12.js';
+import { createLevel12Art } from '../art12.js';
 import { KIDS } from '../data/characters.js';
-import Kid from '../entities/Kid.js';
 import CalculatorBox from '../entities/CalculatorBox.js';
-import BossLevel, { formatTime } from './BossLevel.js';
+import { formatTime } from './BossLevel.js';
+import WeekendLevel from './WeekendLevel.js';
 import { music, sfx } from '../audio/sound.js';
 
 const STREET = { w: 1800, h: 1300 }; // Elin's street (the fight)
 const ROOM = { x: 2000, y: 0 }; // Elin's bedroom (packing)
 const WORLD_W = 3100;
+const WORLD_H = 1700;
+const BEDROOMS = { x: 2000, y: 900 }; // everybody's bedrooms
 // Houses along the top of the street. Each SuperKid goes home to bed at the end.
 const HOUSES = { jay: [230, 'house-0'], olivia: [560, 'house-olivia'], elin: [900, 'house-3'], reese: [1240, 'house-1'], claude: [1570, 'house-2'] };
 const DOOR_Y = 320;
@@ -19,20 +21,9 @@ const DOOR_Y = 320;
 // LEVEL 12 (designed by Elin): SATURDAY. Elin goes on vacation to Rhode Island!
 // She lends the SuperKids her Tech Watch, and Claude joins the team to fight the CALCULATOR BOX.
 // It runs on electricity... and so does the watch, so only the watch can beat it!
-export default class Level12Scene extends BossLevel {
+export default class Level12Scene extends WeekendLevel {
   constructor() {
     super('Level12');
-  }
-
-  // Elin is on vacation, so if you picked Elin you play as Olivia this time.
-  heroId() {
-    const id = super.heroId();
-    return id === 'elin' ? 'olivia' : id;
-  }
-
-  // Story text uses real names in this level (no swapping), because Elin is away.
-  swapNames(text) {
-    return text.replace(/\{Elin\}/g, 'Elin');
   }
 
   create() {
@@ -41,14 +32,15 @@ export default class Level12Scene extends BossLevel {
     createLevel2Art(this);
     createLevel678Art(this);
     createLevel12Art(this);
-    this.physics.world.setBounds(0, 0, WORLD_W, STREET.h);
+    this.physics.world.setBounds(0, 0, WORLD_W, WORLD_H);
     this.obstacles = this.physics.add.staticGroup();
     this.hackStunMs = 4000;
     this.specialCooldown = 8000;
 
     this.drawStreet();
     this.drawRoom();
-    this.createTeam(790, 1150);
+    this.createTeam(790, 1150, { special: 'UNPLUG', specialColor: 0x00e5ff, specialTip: "UNPLUG the Calculator Box with Elin's Tech Watch!" });
+    this.drawBedrooms(BEDROOMS.x, BEDROOMS.y);
 
     this.boss = this.calc = new CalculatorBox(this, 900, 620, new Phaser.Geom.Rectangle(220, 520, STREET.w - 440, STREET.h - 700), this.diff);
     this.calc.sprite.setVisible(false);
@@ -63,23 +55,6 @@ export default class Level12Scene extends BossLevel {
     } else {
       this.runIntro();
     }
-  }
-
-  // The team: you (with Elin's Tech Watch!), your two friends, and Claude.
-  createTeam(x, y) {
-    const hero = KIDS.find((k) => k.id === this.heroId());
-    const heroDef = {
-      ...hero,
-      weapon: { ...hero.weapon, special: 'UNPLUG', specialColor: 0x00e5ff, specialTip: "UNPLUG the Calculator Box with Elin's Tech Watch!" },
-    };
-    const friends = KIDS.filter((k) => k.id !== 'elin' && k.id !== hero.id);
-    const defs = [heroDef, ...friends, { ...CLAUDE_KID, weapon: { ...CLAUDE_KID.weapon } }];
-    this.kids = defs.map((d, i) => new Kid(this, x + i * 70, y, d, i === 0));
-    this.elin = this.kids[0]; // "elin" = the kid you play as
-    this.bots = this.kids.slice(1);
-    this.claudeKid = this.kids[3];
-    this.heroName = hero.name;
-    this.friendDefs = friends;
   }
 
   // ---------- places ----------
@@ -134,18 +109,6 @@ export default class Level12Scene extends BossLevel {
     this.cameras.main.setBounds(0, 0, STREET.w, STREET.h);
   }
 
-  fade(fn) {
-    const cam = this.cameras.main;
-    return new Promise((res) => {
-      cam.fadeOut(500, 0, 0, 0);
-      cam.once('camerafadeoutcomplete', () => {
-        fn();
-        cam.fadeIn(500, 0, 0, 0);
-        this.time.delayedCall(500, res);
-      });
-    });
-  }
-
   // ---------- only the Tech Watch can beat it! ----------
 
   // The Calculator Box can't lose its last bit of power... until you UNPLUG it with the watch.
@@ -187,57 +150,6 @@ export default class Level12Scene extends BossLevel {
     this.popText(b.x, b.y - b.radius - 80, 'POWER DRAINED!', 0x00e5ff, 26);
   }
 
-  // ---------- Claude's 3 powers ----------
-
-  // 1. CODE ZAP and 2. GOOD INK (ink makes the boss slow)
-  kidShoot(kid, damage) {
-    if (kid !== this.claudeKid) return super.kidShoot(kid, damage);
-    const now = this.time.now;
-    if (now < kid.nextAttack || kid.dizzy) return false;
-    kid.nextAttack = now + Phaser.Math.Between(1100, 1700);
-    const b = this.boss;
-    const a = Phaser.Math.Angle.Between(kid.x, kid.y, b.x, b.y);
-    kid.faceToward(b.x, b.y);
-    const ink = Math.random() < 0.35;
-    const shot = this.fireShot(kid, a, ink ? 'goodink' : 'codezap', damage);
-    if (ink) {
-      shot.slow = true;
-      shot.words = ['GOOD INK!', 'SPLOOSH!', 'INKED!'];
-    }
-    sfx(ink ? 'splat' : 'zap');
-    return true;
-  }
-
-  // 3. TENTACLE GRAB: when Claude is close, his tentacles hold the boss still for a moment
-  update(time, delta) {
-    super.update(time, delta);
-    const ck = this.claudeKid;
-    const b = this.boss;
-    this.grabG ??= this.add.graphics().setDepth(8650);
-    this.grabG.clear();
-    if (!this.fightActive || !b.alive) return;
-    if (time < (this.grabUntil || 0)) {
-      this.grabG.lineStyle(7, 0xf28c38, 1);
-      for (let i = 0; i < 4; i++) {
-        const off = (i - 1.5) * 14;
-        const midX = (ck.x + b.x) / 2 + Math.sin(time / 120 + i) * 20;
-        const midY = (ck.y + b.y) / 2 + off;
-        this.grabG.beginPath();
-        this.grabG.moveTo(ck.x, ck.y);
-        this.grabG.lineTo(midX, midY);
-        this.grabG.lineTo(b.x + off, b.y);
-        this.grabG.strokePath();
-      }
-    } else if (time > (this.grabReadyAt || 0) && !ck.dizzy && Phaser.Math.Distance.Between(ck.x, ck.y, b.x, b.y) < b.radius + 140) {
-      this.grabReadyAt = time + 10000;
-      this.grabUntil = time + 1500;
-      this.bossStunUntil = Math.max(this.bossStunUntil, time + 1500);
-      this.stunIce = false;
-      sfx('toss');
-      this.popText(b.x, b.y - b.radius - 50, 'TENTACLE GRAB!', 0xf28c38, 30);
-    }
-  }
-
   onFightStart() {
     this.foodTimer = this.time.addEvent({
       delay: 4500,
@@ -270,10 +182,6 @@ export default class Level12Scene extends BossLevel {
 
   sayAs(def, text) {
     return this.say(def, text);
-  }
-
-  claudeSays(text) {
-    return this.dialog.show('Claude', text, 'claude', '#f28c38');
   }
 
   calcSays(text, nice) {
@@ -431,7 +339,10 @@ export default class Level12Scene extends BossLevel {
     );
     this.cameras.main.pan(900, 520, 1500, 'Sine.easeInOut');
     await Promise.all(walks);
-    await this.wait(1800);
+    await this.wait(1500);
+    // inside everybody's house: going to bed
+    await this.fade(() => this.goToBed());
+    await this.wait(2500);
     this.levelComplete({
       level: 12,
       replay: 'Level12',

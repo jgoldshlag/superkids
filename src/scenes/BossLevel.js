@@ -76,9 +76,9 @@ export default class BossLevel extends BaseLevel {
 
     const bw = 420;
     this.bossBar = this.add.container(W / 2, 0).setDepth(9500).setVisible(false);
-    const name = this.add
+    const name = (this.bossNameText = this.add
       .text(0, 16, this.bossName, { fontFamily: 'Arial Black, Arial', fontSize: '20px', color: '#ffffff', stroke: '#000', strokeThickness: 4 })
-      .setOrigin(0.5, 0);
+      .setOrigin(0.5, 0));
     const bg = this.add.rectangle(-bw / 2, 44, bw, 20, 0x222222).setOrigin(0, 0).setStrokeStyle(3, 0xffffff);
     this.bossFill = this.add.rectangle(-bw / 2 + 2, 46, bw - 4, 16, 0x9b5de5).setOrigin(0, 0);
     this.bossFillWidth = bw - 4;

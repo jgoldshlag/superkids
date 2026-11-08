@@ -12,7 +12,7 @@ export const LEVELS = [
   { name: 'The Everything Boss', scene: 'Level10' },
   { name: 'Save Claude!', scene: 'Level11' },
   { name: 'Saturday: Calculator Box', scene: 'Level12' },
-  { name: 'Sunday Mission' },
+  { name: 'Sunday: Storm Twins', scene: 'Level13' },
   { name: '?' },
   { name: '?' },
   { name: '?' },
