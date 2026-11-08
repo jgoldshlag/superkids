@@ -158,7 +158,7 @@ export default class BossLevel extends BaseLevel {
   doSpecial() {
     const now = this.time.now;
     if (now < this.hackReadyAt || !this.boss.alive) return;
-    this.hackReadyAt = now + 12000;
+    this.hackReadyAt = now + (this.specialCooldown ?? 12000);
     const id = this.elin.def.weapon.id;
     if (id === 'trident') this.doFreeze();
     else if (id === 'sword') this.doFireSword();
