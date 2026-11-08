@@ -162,7 +162,7 @@ const TEACHER = {
 };
 const DOCTOR = {
   id: 'doctor',
-  name: 'Dr. Kind',
+  name: 'Dr. Nana',
   skin: 0x8d5524,
   hair: 0x1a1a1a,
   hairStyle: 'short',

@@ -304,7 +304,7 @@ export default class Level8Scene extends BossLevel {
       this.bedElin.setVisible(true).setAngle(0);
       [oK, rK, jK].forEach((k, i) => k.sprite.setPosition(HOSP.x + 300 + i * 90, HOSP.y + 520));
     });
-    await this.doctorSays("I'm Dr. Kind. Don't worry - Elin is safe here in the hospital.");
+    await this.doctorSays("I'm Dr. Nana. Don't worry - Elin is safe here in the hospital.");
     await this.doctorSays("She's in a very deep sleep. She's stuck inside a bad dream.");
     await this.say(jay, 'Is there anything we can do to help her?');
     await this.say(olivia, "Her Tech Watch! It knows every tech code in the world... even the code to go INTO a dream!");
