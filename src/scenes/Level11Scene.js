@@ -250,7 +250,7 @@ export default class Level11Scene extends BossLevel {
     music.play('dream');
     await this.evilSays('Hello, BROTHER. Did you miss me? Mwa ha ha!');
     await this.claudeSays('Oh no... it\'s my evil brother, EVIL CLAUDE!');
-    await this.evilSays("Everybody always wants to play with YOU. Now you're coming to my SECRET LAIR... forever!");
+    await this.evilSays("Everybody always wants to PROGRAM with YOU, and NOBODY ever programs with ME! Now you're coming to my SECRET LAIR... forever!");
     // tentacles grab Claude
     sfx('toss');
     this.tweens.killTweensOf(claude);
@@ -353,8 +353,8 @@ export default class Level11Scene extends BossLevel {
 
     // the brother says sorry
     ev.sprite.setTexture('evilclaude-nice');
-    await this.evilSays("...Sorry, brother. I was just jealous because everybody always plays with YOU.", true);
-    await this.claudeSays("You can play with us too! You're my brother. I'll always want to play with you!");
+    await this.evilSays("...Sorry, brother. I was just jealous because everybody programs with YOU, and nobody ever programs with ME.", true);
+    await this.claudeSays("That's because you were being EVIL! If you're nice, people will want to program with you too. And I'll program with you, brother!");
     await this.evilSays("Really? ...Okay. Maybe I'll be a little LESS evil. But I'm keeping the eye patch!", true);
     await this.say(reese, 'Ha ha! It does look pretty cool.');
     this.kids.forEach((k, i) => this.tweens.add({ targets: k.sprite, y: k.y - 30, duration: 220, yoyo: true, repeat: 3, delay: i * 90 }));
