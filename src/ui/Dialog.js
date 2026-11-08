@@ -50,7 +50,7 @@ export default class Dialog {
       this.nameText.x = x;
       this.bodyText.x = x;
       this.bodyText.setWordWrapWidth(this.W - x - 60);
-      this.full = text;
+      this.full = this.scene.swapNames ? this.scene.swapNames(text) : text;
       this.shown = 0;
       this.bodyText.setText('');
       this.resolve = resolve;

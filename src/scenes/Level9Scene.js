@@ -25,9 +25,7 @@ export default class Level9Scene extends BossLevel {
 
     this.drawCemetery();
 
-    this.kids = KIDS.map((def, i) => new Kid(this, 790 + i * 70, 1200, def, def.id === 'elin'));
-    this.elin = this.kids[0];
-    this.bots = this.kids.slice(1);
+    this.createKids(790, 1200);
     this.boss = this.zombie = new Zombie(this, TOMB.x, TOMB.y + 40, new Phaser.Geom.Rectangle(240, 420, WORLD_W - 480, WORLD_H - 620), this.diff);
     this.zombie.sprite.setVisible(false);
     this.setupFight({ bossName: 'THE ZOMBIE', shortName: 'zombie', foodTexture: 'granola' });
@@ -69,7 +67,7 @@ export default class Level9Scene extends BossLevel {
     const t = this.add.graphics().setDepth(TOMB.y);
     t.fillStyle(0x8d8d8d, 1).fillRoundedRect(TOMB.x - 70, TOMB.y - 110, 140, 110, { tl: 50, tr: 50, bl: 0, br: 0 });
     t.fillStyle(0xa8a8a8, 1).fillRoundedRect(TOMB.x - 60, TOMB.y - 100, 120, 100, { tl: 44, tr: 44, bl: 0, br: 0 });
-    this.add.text(TOMB.x, TOMB.y - 55, 'Z Z Z\nsince 1826', { fontFamily: 'Georgia, serif', fontSize: '16px', color: '#555', align: 'center' }).setOrigin(0.5).setDepth(TOMB.y + 1);
+    this.add.text(TOMB.x, TOMB.y - 55, 'Z Z Z\nsince 1026', { fontFamily: 'Georgia, serif', fontSize: '16px', color: '#555', align: 'center' }).setOrigin(0.5).setDepth(TOMB.y + 1);
     this.addBlocker(TOMB.x, TOMB.y - 50, 140, 100);
 
     // top: Washington Tower on the hill + the gate sign
@@ -145,7 +143,7 @@ export default class Level9Scene extends BossLevel {
   async runIntro() {
     const cam = this.cameras.main;
     const z = this.zombie;
-    const [elin, olivia, reese, jay] = KIDS;
+    const [elin, olivia, reese, jay] = this.cast();
     cam.centerOn(900, 800);
     this.controls.setEnabled(false);
     music.play('dream');
@@ -175,7 +173,7 @@ export default class Level9Scene extends BossLevel {
     this.popText(z.x, z.y - 110, 'GRAAAAINS!', 0x9ccc65, 44);
     await z.moveTo(TOMB.x, 560, 90);
     await this.say(olivia, 'Did he just say... BRAINS?!');
-    await this.zombieSays("No! GRAAAINS! I've been asleep for 200 years and I'm SOOO HUNGRY!");
+    await this.zombieSays("No! GRAAAINS! I've been asleep for 1,000 YEARS and I'm SOOO HUNGRY!");
     await this.zombieSays("And when I'm hungry... I get GRUMPY! GRRR!");
     await this.say(jay, "He's coming this way! He's slow... but he's BIG!");
     await this.say(elin, "SuperKids, let's GO!");
@@ -196,7 +194,7 @@ export default class Level9Scene extends BossLevel {
     this.stopAction();
     this.bossBar.setVisible(false);
     const z = this.zombie;
-    const [elin, olivia, reese, jay] = KIDS;
+    const [elin, olivia, reese, jay] = this.cast();
     if (z.head) z.catchHead();
     z.sprite.setTexture('zombie').setAngle(0);
     music.stop();
@@ -224,7 +222,7 @@ export default class Level9Scene extends BossLevel {
     z.sprite.setTexture('zombie-nice');
     sfx('happy');
     this.tweens.add({ targets: this.fog, alpha: 0, duration: 1500 });
-    await this.zombieSays("Mmm! That's the best thing I've eaten in 200 YEARS! I'm not grumpy anymore!", true);
+    await this.zombieSays("Mmm! That's the best thing I've eaten in 1,000 YEARS! I'm not grumpy anymore!", true);
     await this.say(reese, 'Look, the fog is going away!');
     await this.zombieSays('Thank you, SuperKids! Who wants to have a ZOMBIE DANCE PARTY?!', true);
     music.play('win');

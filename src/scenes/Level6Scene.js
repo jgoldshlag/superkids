@@ -26,9 +26,7 @@ export default class Level6Scene extends BossLevel {
 
     this.drawClassroom();
 
-    this.kids = KIDS.map((def, i) => new Kid(this, 690 + i * 70, 1080, def, def.id === 'elin'));
-    this.elin = this.kids[0];
-    this.bots = this.kids.slice(1);
+    this.createKids(690, 1080);
     this.boss = this.robot = new Robot(this, BENCH.x, BENCH.y, new Phaser.Geom.Rectangle(220, 360, WORLD_W - 440, WORLD_H - 520), this.diff);
     this.setupFight({ bossName: 'SUPER ROBOT 3000', shortName: 'robot', foodTexture: 'battery' });
 
@@ -146,8 +144,8 @@ export default class Level6Scene extends BossLevel {
   async runIntro() {
     const cam = this.cameras.main;
     const r = this.robot;
-    const [elin, olivia, reese, jay] = KIDS;
-    const jayKid = this.kids[3];
+    const [elin, olivia, reese, jay] = this.cast();
+    const jayKid = this.castKids()[3];
     cam.centerOn(800, 700);
     this.controls.setEnabled(false);
     r.sprite.setTint(0x777777); // turned off
@@ -179,18 +177,19 @@ export default class Level6Scene extends BossLevel {
     await this.teacherSays("Eek! I'll hide back here! SuperKids, you have to stop it!");
     jayKid.sprite.setPosition(900, 640);
     await this.robotSays('TARGET FOUND: SUPERKIDS. CHARGING LASERS!');
-    await this.say(elin, 'My Tech Watch knows every tech code in the world. Robots HATE that!');
+    await this.say(elin, "Robots are no match for the SuperKids!");
     await this.say(reese, "SuperKids... let's GO!");
 
     const move = this.controls.isTouch ? 'Drag on the LEFT side to move. Tap POW! to attack.' : 'ARROW KEYS to move. SPACE to attack.';
-    const hack = this.controls.isTouch ? 'the HACK button' : 'E';
+    const sp = this.elin.def.weapon.special;
+    const key = this.controls.isTouch ? 'the round button' : 'E';
     await this.dialog.show(
       'How to play',
       `${move}\nWhen you see a thin RED line, MOVE!\nA giant laser is coming!`,
       null,
       '#9be7ff'
     );
-    await this.dialog.show('How to play', `HACK (${hack}) freezes robots for extra long.\nGrab the batteries before the robot recharges!`, null, '#9be7ff');
+    await this.dialog.show('How to play', `${['HACK', 'FREEZE'].includes(sp) ? `${sp} (${key}) freezes robots for extra long!` : `Your super move is ${sp} (${key})!`}\nGrab the batteries before the robot recharges!`, null, '#9be7ff');
     r.py = Math.max(r.py, 380);
     this.startFight();
   }
@@ -205,7 +204,7 @@ export default class Level6Scene extends BossLevel {
     this.stopAction();
     this.bossBar.setVisible(false);
     const r = this.robot;
-    const [elin, olivia, reese, jay] = KIDS;
+    const [elin, olivia, reese, jay] = this.cast();
     music.stop();
     sfx('hack');
     this.popText(r.x, r.y - 110, 'SYSTEM... ERROR...', 0xff9100, 34);
@@ -214,8 +213,10 @@ export default class Level6Scene extends BossLevel {
     }
     await this.wait(1300);
     r.sprite.clearTint();
-    await this.say(elin, 'Now for my favorite tech code... FRIEND MODE!');
-    const beam = this.add.line(0, 0, this.elin.x, this.elin.y, r.x, r.y, 0x00e5ff).setOrigin(0).setLineWidth(5).setDepth(8700);
+    // Elin's Tech Watch knows the code for FRIEND MODE
+    const elinKid = this.kids[0];
+    await this.say(KIDS[0], "My Tech Watch knows every tech code... even FRIEND MODE!");
+    const beam = this.add.line(0, 0, elinKid.x, elinKid.y, r.x, r.y, 0x00e5ff).setOrigin(0).setLineWidth(5).setDepth(8700);
     this.tweens.add({ targets: beam, alpha: 0, duration: 700, onComplete: () => beam.destroy() });
     sfx('twinkle');
     await r.growTo(1.2, 1, 800, 'Sine.easeInOut');

@@ -94,8 +94,9 @@ export default class BossLevel extends BaseLevel {
     this.bossFill.fillColor = b.angry ? 0xff3b5c : 0x9b5de5;
     const left = Math.ceil((this.hackReadyAt - this.time.now) / 1000);
     const ready = left <= 0;
-    this.hackText.setText(ready ? `HACK ready!${this.controls.isTouch ? '' : ' (press E)'}` : `HACK in ${left}...`).setColor(ready ? '#00e5ff' : '#90a4ae');
-    this.controls.setSpecialLabel(ready ? 'HACK' : String(left), ready);
+    const w = this.elin.def.weapon;
+    this.hackText.setText(ready ? `${w.special} ready!${this.controls.isTouch ? '' : ' (press E)'}` : `${w.special} in ${left}...`).setColor(ready ? colorHex(w.specialColor) : '#90a4ae');
+    this.controls.setSpecialLabel(ready ? w.special : String(left), ready, w.specialColor);
   }
 
   // ---------- SuperKids weapons ----------
@@ -108,16 +109,22 @@ export default class BossLevel extends BaseLevel {
     const b = this.boss;
     const a = Phaser.Math.Angle.Between(kid.x, kid.y, b.x, b.y);
     kid.faceToward(b.x, b.y);
-    const shot = this.add.image(kid.x + Math.cos(a) * 24, kid.y + Math.sin(a) * 24, w.shot).setRotation(a).setDepth(8600);
-    shot.vx = Math.cos(a) * 520;
-    shot.vy = Math.sin(a) * 520;
-    shot.born = now;
-    shot.damage = damage;
-    shot.kid = kid;
-    if (w.shot === 'egg' || w.shot === 'kidfire') shot.spin = true;
-    this.shots.push(shot);
+    this.fireShot(kid, a, w.shot, damage);
     sfx(w.sound);
     return true;
+  }
+
+  fireShot(kid, a, texture, damage, scale = 1) {
+    const shot = this.add.image(kid.x + Math.cos(a) * 24, kid.y + Math.sin(a) * 24, texture).setRotation(a).setScale(scale).setDepth(8600);
+    shot.vx = Math.cos(a) * 520;
+    shot.vy = Math.sin(a) * 520;
+    shot.born = this.time.now;
+    shot.damage = damage;
+    shot.kid = kid;
+    shot.big = scale > 1;
+    if (texture === 'egg' || texture === 'kidfire') shot.spin = true;
+    this.shots.push(shot);
+    return shot;
   }
 
   updateShots(time, delta) {
@@ -128,7 +135,7 @@ export default class BossLevel extends BaseLevel {
       s.y += s.vy * dt;
       if (s.spin) s.angle += 720 * dt;
       let gone = time - s.born > 1500;
-      if (!gone && b.alive && Phaser.Math.Distance.Between(s.x, s.y, b.x, b.y) < b.radius + 10) {
+      if (!gone && b.alive && Phaser.Math.Distance.Between(s.x, s.y, b.x, b.y) < b.radius + (s.big ? 30 : 10)) {
         const w = s.kid.def.weapon;
         b.damage(s.damage, s.kid);
         this.popText(s.x, s.y - 20, Phaser.Utils.Array.GetRandom(w.words), s.kid.def.cape, 24);
@@ -147,12 +154,66 @@ export default class BossLevel extends BaseLevel {
     }
   }
 
-  // Elin's watch knows every tech code in the world... HACK the boss!
-  doHack() {
+  // Each SuperKid's super move (special button: E / K / the round button).
+  doSpecial() {
     const now = this.time.now;
     if (now < this.hackReadyAt || !this.boss.alive) return;
     this.hackReadyAt = now + 12000;
+    const id = this.elin.def.weapon.id;
+    if (id === 'trident') this.doFreeze();
+    else if (id === 'sword') this.doFireSword();
+    else if (id === 'eggshield') this.doEggShield();
+    else this.doHack();
+  }
+
+  // Olivia: freeze the boss solid with the Ice Trident
+  doFreeze() {
+    const b = this.boss;
+    this.bossStunUntil = this.time.now + (this.hackStunMs ?? 3000);
+    this.stunIce = true;
+    sfx('ice');
+    this.projectiles.clear(true, true);
+    this.popText(b.x, b.y - b.radius - 40, 'FROZEN SOLID!', 0x9be7ff, 44);
+    for (let i = 0; i < 8; i++) {
+      const a = (i / 8) * Math.PI * 2;
+      const shard = this.add.image(this.elin.x, this.elin.y, 'icebolt').setScale(1.5).setRotation(a).setDepth(8700);
+      this.tweens.add({ targets: shard, x: b.x + Math.cos(a) * 30, y: b.y + Math.sin(a) * 30, duration: 300, onComplete: () => shard.destroy() });
+    }
+    b.damage(10, this.elin);
+  }
+
+  // Reese: three giant fire sword waves
+  doFireSword() {
+    const e = this.elin;
+    const b = this.boss;
+    sfx('fire');
+    this.popText(e.x, e.y - 60, 'FIRE SWORD!', 0xff7043, 40);
+    const a = Phaser.Math.Angle.Between(e.x, e.y, b.x, b.y);
+    e.faceToward(b.x, b.y);
+    for (const off of [-0.25, 0, 0.25]) this.fireShot(e, a + off, 'kidfire', 9, 3);
+  }
+
+  // Jay: a giant egg shield around every SuperKid
+  doEggShield() {
+    const until = this.time.now + 4000;
+    sfx('block');
+    this.projectiles.clear(true, true);
+    this.popText(this.elin.x, this.elin.y - 60, 'EGG SHIELD!', 0xffc107, 40);
+    this.bubbles = this.bubbles || [];
+    for (const k of this.kids) {
+      k.invulnUntil = Math.max(k.invulnUntil, until);
+      const bubble = this.add.circle(k.x, k.y, 44, 0xfffaf0, 0.3).setStrokeStyle(5, 0xffc107).setDepth(9002);
+      bubble.kid = k;
+      bubble.until = until;
+      this.bubbles.push(bubble);
+    }
+  }
+
+  // Elin's watch knows every tech code in the world... HACK the boss!
+  doHack() {
+    const now = this.time.now;
     this.bossStunUntil = now + (this.hackStunMs ?? 3000);
+    this.stunIce = false;
     const b = this.boss;
     sfx('hack');
     this.projectiles.clear(true, true);
@@ -265,7 +326,7 @@ export default class BossLevel extends BaseLevel {
       .text(
         this.scale.width / 2,
         this.scale.height - 40,
-        this.controls.isTouch ? 'Tap the blue HACK button to freeze the boss with your watch!' : 'Press E to HACK the boss with your Tech Watch!',
+        `${this.controls.isTouch ? 'Tap the round button:' : 'Press E:'} ${this.elin.def.weapon.specialTip}`,
         { fontFamily: 'Arial Black, Arial', fontSize: '22px', color: '#00e5ff', stroke: '#000', strokeThickness: 5 }
       )
       .setOrigin(0.5)
@@ -300,7 +361,7 @@ export default class BossLevel extends BaseLevel {
     const { width: W, height: H } = this.scale;
     this.add.rectangle(0, 0, W, H, 0x000000, 0.55).setOrigin(0).setScrollFactor(0).setDepth(29000);
     this.add
-      .text(W / 2, H / 2 - 80, 'Oh no! Elin got bonked!', {
+      .text(W / 2, H / 2 - 80, `Oh no! ${this.elin.def.name} got bonked!`, {
         fontFamily: 'Arial Black, Arial',
         fontSize: '48px',
         color: '#ffe14d',
@@ -328,14 +389,14 @@ export default class BossLevel extends BaseLevel {
         const d = Phaser.Math.Distance.Between(e.x, e.y, b.x, b.y);
         if (d < b.radius + 60) {
           e.faceToward(b.x, b.y);
-          e.punch(b, 5, 280);
+          e.punch(b, 5 + (e.def.weapon?.meleeBonus ?? 0), 280);
         } else if (d < 650) {
           this.kidShoot(e, 3);
         } else {
           e.punch(b, 5, 280);
         }
       }
-      if (this.controls.consumeSpecial()) this.doHack();
+      if (this.controls.consumeSpecial()) this.doSpecial();
 
       // Grab the food before the boss eats it (and get a heart back)
       for (const f of [...this.foods]) {
@@ -367,7 +428,8 @@ export default class BossLevel extends BaseLevel {
     b.ai = wasAi;
     if (stunned) {
       if (b.px !== undefined) b.sprite.x += Phaser.Math.Between(-4, 4); // shake (not for the pigeon, whose sprite IS its position)
-      b.sprite.setTint(Math.floor(time / 80) % 2 ? 0x39ff14 : 0x00e5ff);
+      if (this.stunIce) b.sprite.setTint(0x9be7ff);
+      else b.sprite.setTint(Math.floor(time / 80) % 2 ? 0x39ff14 : 0x00e5ff);
     } else if (slowed) {
       b.sprite.setTint(0x9be7ff);
     } else if (this.wasTinted) {
@@ -375,6 +437,12 @@ export default class BossLevel extends BaseLevel {
     }
     this.wasTinted = stunned || slowed;
     for (const k of this.kids) k.update(time, delta);
+    // Jay's egg shield bubbles follow the kids
+    if (this.bubbles?.length) {
+      for (const bb of this.bubbles) bb.setPosition(bb.kid.x, bb.kid.y);
+      for (const bb of this.bubbles.filter((x) => time > x.until || !this.fightActive)) bb.destroy();
+      this.bubbles = this.bubbles.filter((x) => x.active);
+    }
     this.updateHud();
   }
 

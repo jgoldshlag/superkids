@@ -12,7 +12,7 @@ export const KIDS = [
     shirt: 0xb47ced,
     pants: 0x2d3047,
     // A watch that knows every tech code in the world. Special: HACK the boss!
-    weapon: { id: 'watch', name: 'Tech Watch', shot: 'laser', words: ['ZAP!', 'BEEP!', 'BZZT!'], sound: 'zap' },
+    weapon: { id: 'watch', name: 'Tech Watch', shot: 'laser', words: ['ZAP!', 'BEEP!', 'BZZT!'], sound: 'zap', special: 'HACK', specialColor: 0x00bcd4, specialTip: 'HACK the boss with your Tech Watch to freeze it!' },
   },
   {
     id: 'olivia',
@@ -25,7 +25,7 @@ export const KIDS = [
     shirt: 0xf78bd0,
     pants: 0x2d3047,
     // Trident with ice powers: ice blasts slow the boss down.
-    weapon: { id: 'trident', name: 'Ice Trident', shot: 'icebolt', words: ['ICE!', 'FREEZE!', 'BRRR!'], sound: 'ice', effect: 'freeze' },
+    weapon: { id: 'trident', name: 'Ice Trident', shot: 'icebolt', words: ['ICE!', 'FREEZE!', 'BRRR!'], sound: 'ice', effect: 'freeze', special: 'FREEZE', specialColor: 0x4fc3f7, specialTip: 'FREEZE the boss solid with your Ice Trident!' },
   },
   {
     id: 'reese',
@@ -38,7 +38,7 @@ export const KIDS = [
     shirt: 0x4cc3f5,
     pants: 0x2d3047,
     // Fireballs + a sword that can cut through anything (extra strong up close).
-    weapon: { id: 'sword', name: 'Fireballs + Sword', shot: 'kidfire', words: ['SLASH!', 'SWISH!', 'FWOOSH!'], sound: 'fire', meleeBonus: 2 },
+    weapon: { id: 'sword', name: 'Fireballs + Sword', shot: 'kidfire', words: ['SLASH!', 'SWISH!', 'FWOOSH!'], sound: 'fire', meleeBonus: 2, special: 'FIRE', specialColor: 0xff7043, specialTip: 'Send giant FIRE SWORD waves at the boss!' },
   },
   {
     id: 'jay',
@@ -51,7 +51,7 @@ export const KIDS = [
     shirt: 0x5fd98f,
     pants: 0x2d3047,
     // Egg shield blocks hits, and throwing eggs. SPLAT!
-    weapon: { id: 'eggshield', name: 'Egg Shield + Eggs', shot: 'egg', words: ['SPLAT!', 'EGGED!', 'YOLK!'], sound: 'egg', shield: true },
+    weapon: { id: 'eggshield', name: 'Egg Shield + Eggs', shot: 'egg', words: ['SPLAT!', 'EGGED!', 'YOLK!'], sound: 'egg', shield: true, special: 'SHIELD', specialColor: 0xffc107, specialTip: 'Put a giant EGG SHIELD around all the SuperKids!' },
   },
 ];
 
@@ -67,5 +67,27 @@ export const MAN = {
   pants: 0x455a64,
   hat: 0x4e6b3a,
 };
+
+// Which SuperKid you play as (picked on the title screen). Everyone else is a helper bot.
+export function getPlayerId(scene) {
+  let id = scene.registry.get('player');
+  if (!id) {
+    try {
+      id = localStorage.getItem('superkids-player');
+    } catch {
+      /* ignore */
+    }
+  }
+  return KIDS.some((k) => k.id === id) ? id : 'elin';
+}
+
+export function setPlayerId(scene, id) {
+  scene.registry.set('player', id);
+  try {
+    localStorage.setItem('superkids-player', id);
+  } catch {
+    /* ignore */
+  }
+}
 
 export const colorHex = (c) => '#' + c.toString(16).padStart(6, '0');

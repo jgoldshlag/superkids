@@ -28,9 +28,7 @@ export default class Level3Scene extends BossLevel {
 
     this.drawPark();
 
-    this.kids = KIDS.map((def, i) => new Kid(this, 760 + i * 70, 1120, def, def.id === 'elin'));
-    this.elin = this.kids[0];
-    this.bots = this.kids.slice(1);
+    this.createKids(760, 1120);
     this.boss = this.bunny = new Bunny(this, 500, 760, new Phaser.Geom.Rectangle(170, 340, WORLD_W - 340, WORLD_H - 470), this.diff);
     this.setupFight({ bossName: 'CHUBBY BUNNY', shortName: 'bunny', foodTexture: 'carrot' });
 
@@ -181,7 +179,7 @@ export default class Level3Scene extends BossLevel {
   async runIntro() {
     const cam = this.cameras.main;
     const b = this.bunny;
-    const [elin, olivia, reese, jay] = KIDS;
+    const [elin, olivia, reese, jay] = this.cast();
     cam.centerOn(900, 760);
     this.controls.setEnabled(false);
     this.kids.forEach((k, i) => this.tweens.add({ targets: k.sprite, y: 940, duration: 1200, delay: i * 100 }));
@@ -237,7 +235,7 @@ export default class Level3Scene extends BossLevel {
     this.stopAction();
     this.bossBar.setVisible(false);
     const b = this.bunny;
-    const [elin, olivia, reese, jay] = KIDS;
+    const [elin, olivia, reese, jay] = this.cast();
     this.cameras.main.shake(500, 0.015);
     this.popText(b.x, b.y - b.radius - 20, 'BONK!', 0xffe14d, 60);
     music.stop();

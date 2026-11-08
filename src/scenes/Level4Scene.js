@@ -27,9 +27,7 @@ export default class Level4Scene extends BossLevel {
 
     this.drawSchool();
 
-    this.kids = KIDS.map((def, i) => new Kid(this, 790 + i * 70, 1200, def, def.id === 'elin'));
-    this.elin = this.kids[0];
-    this.bots = this.kids.slice(1);
+    this.createKids(790, 1200);
     this.boss = this.dragon = new Dragon(this, DOOR.x, DOOR.y + 60, new Phaser.Geom.Rectangle(220, 440, WORLD_W - 440, WORLD_H - 640), this.diff);
     this.dragon.sprite.setVisible(false);
     this.setupFight({ bossName: 'SCHOOL DRAGON', shortName: 'dragon', foodTexture: 'pepper' });
@@ -155,7 +153,7 @@ export default class Level4Scene extends BossLevel {
   async runIntro() {
     const cam = this.cameras.main;
     const d = this.dragon;
-    const [elin, olivia, reese, jay] = KIDS;
+    const [elin, olivia, reese, jay] = this.cast();
     cam.centerOn(900, 800);
     this.controls.setEnabled(false);
     music.stop();
@@ -197,7 +195,7 @@ export default class Level4Scene extends BossLevel {
     this.stopAction();
     this.bossBar.setVisible(false);
     const d = this.dragon;
-    const [elin, olivia, reese, jay] = KIDS;
+    const [elin, olivia, reese, jay] = this.cast();
     this.cameras.main.shake(500, 0.015);
     this.popText(d.x, d.y - d.radius - 20, 'BONK!', 0xffe14d, 60);
     music.stop();

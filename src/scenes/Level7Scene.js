@@ -27,9 +27,7 @@ export default class Level7Scene extends BossLevel {
 
     this.drawPark();
 
-    this.kids = KIDS.map((def, i) => new Kid(this, 790 + i * 70, 1200, def, def.id === 'elin'));
-    this.elin = this.kids[0];
-    this.bots = this.kids.slice(1);
+    this.createKids(790, 1200);
     this.boss = this.heart = new HeartBoss(this, 900, 520, new Phaser.Geom.Rectangle(240, 380, WORLD_W - 480, WORLD_H - 600), this.diff);
     this.heart.sprite.setVisible(false);
     this.setupFight({ bossName: 'THE HEART BOSS', shortName: 'Heart Boss', foodTexture: 'candyheart' });
@@ -200,7 +198,7 @@ export default class Level7Scene extends BossLevel {
   async runIntro() {
     const cam = this.cameras.main;
     const h = this.heart;
-    const [elin, olivia, reese, jay] = KIDS;
+    const [elin, olivia, reese, jay] = this.cast();
     cam.centerOn(900, 900);
     this.controls.setEnabled(false);
     this.kids.forEach((k, i) => this.tweens.add({ targets: k.sprite, y: 960, duration: 1200, delay: i * 100 }));
@@ -242,7 +240,7 @@ export default class Level7Scene extends BossLevel {
     this.bossBar.setVisible(false);
     this.feelText.setVisible(false);
     const h = this.heart;
-    const [elin, olivia, reese, jay] = KIDS;
+    const [elin, olivia, reese, jay] = this.cast();
     music.stop();
     sfx('bonk');
     h.setMood('sad');

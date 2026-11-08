@@ -27,6 +27,11 @@ export default class Level2Scene extends BaseLevel {
     super('Level2');
   }
 
+  heroId() {
+    const id = super.heroId();
+    return id === 'olivia' ? 'elin' : id;
+  }
+
   create() {
     createArt(this);
     createLevel2Art(this);
@@ -41,7 +46,8 @@ export default class Level2Scene extends BaseLevel {
     this.placeStuff();
     this.placeStars();
 
-    const [elinDef, oliviaDef, reeseDef, jayDef] = KIDS;
+    // Olivia hides in her treehouse, so the hero is never Olivia in this level
+    const [elinDef, oliviaDef, reeseDef, jayDef] = this.cast();
     this.elin = new Kid(this, 260, 668, elinDef, true);
     this.olivia = new Kid(this, 330, 668, oliviaDef, false);
     this.reese = new Kid(this, 190, 690, reeseDef, false);
@@ -223,9 +229,7 @@ export default class Level2Scene extends BaseLevel {
       sp.blocker = this.addBlocker(x, y + 20, 26, 20);
       return sp;
     };
-    const elin = KIDS[0];
-    const reese = KIDS[2];
-    const jay = KIDS[3];
+    const [elin, , reese, jay] = this.cast();
 
     this.npcs = [
       {
@@ -307,7 +311,7 @@ export default class Level2Scene extends BaseLevel {
     this.busy = true;
     this.controls.setEnabled(false);
     await this.wait(500);
-    const [elin, olivia, reese, jay] = KIDS;
+    const [elin, olivia, reese, jay] = this.cast();
     await this.say(olivia, 'Hey everyone! Guess what? I have a brand new TREEHOUSE!');
     await this.say(jay, 'Whoa! Where is it?');
     await this.say(olivia, "It's at my house, down this street. But it's SUPER hidden. Bet you can't find it!");
@@ -351,7 +355,7 @@ export default class Level2Scene extends BaseLevel {
     this.controls.setEnabled(false);
     const elapsed = this.time.now - this.startTime;
     for (const k of this.kids) k.walk(0, 0);
-    const [elin, olivia, reese, jay] = KIDS;
+    const [elin, olivia, reese, jay] = this.cast();
 
     this.popText(this.olivia.x, this.olivia.y - 50, 'You found it!', 0xffe14d, 32);
     music.play('win');

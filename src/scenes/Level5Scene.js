@@ -26,9 +26,7 @@ export default class Level5Scene extends BossLevel {
 
     this.drawGym();
 
-    this.kids = KIDS.map((def, i) => new Kid(this, 690 + i * 70, 1040, def, def.id === 'elin'));
-    this.elin = this.kids[0];
-    this.bots = this.kids.slice(1);
+    this.createKids(690, 1040);
     this.boss = this.principal = new Principal(this, 800, 330, new Phaser.Geom.Rectangle(200, 330, WORLD_W - 400, WORLD_H - 470), this.diff);
     this.principal.sprite.setVisible(false);
     this.setupFight({ bossName: 'GRUMPY METER', shortName: 'principal', foodTexture: 'coffee' });
@@ -139,7 +137,7 @@ export default class Level5Scene extends BossLevel {
   async runIntro() {
     const cam = this.cameras.main;
     const p = this.principal;
-    const [elin, olivia, reese, jay] = KIDS;
+    const [elin, olivia, reese, jay] = this.cast();
     cam.centerOn(800, 800);
     this.controls.setEnabled(false);
     this.kids.forEach((k, i) => this.tweens.add({ targets: k.sprite, y: 880, duration: 1200, delay: i * 100 }));
@@ -178,7 +176,7 @@ export default class Level5Scene extends BossLevel {
     this.stopAction();
     this.bossBar.setVisible(false);
     const p = this.principal;
-    const [elin, olivia, reese, jay] = KIDS;
+    const [elin, olivia, reese, jay] = this.cast();
     music.stop();
     this.popText(p.x, p.y - 110, 'Okay, okay! I give up!', 0xffffff, 32);
     await this.wait(900);

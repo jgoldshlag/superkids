@@ -23,6 +23,11 @@ export default class TreehouseScene extends BaseLevel {
     this.result = data || {};
   }
 
+  heroId() {
+    const id = super.heroId();
+    return id === 'olivia' ? 'elin' : id;
+  }
+
   create() {
     createArt(this);
     createLevel2Art(this);
@@ -34,7 +39,7 @@ export default class TreehouseScene extends BaseLevel {
 
     this.drawRoom();
 
-    const [elinDef, oliviaDef, reeseDef, jayDef] = KIDS;
+    const [elinDef, oliviaDef, reeseDef, jayDef] = this.cast();
     this.elin = new Kid(this, 512, 640, elinDef, true);
     this.elin.sprite.setCollideWorldBounds(true);
     this.physics.add.collider(this.elin.sprite, this.obstacles);
@@ -160,7 +165,7 @@ export default class TreehouseScene extends BaseLevel {
     for (let x = 908; x < 960; x += 10) e.lineBetween(x, 215, x, 255);
 
     // things to explore
-    const [elin, olivia, reese, jay] = KIDS;
+    const [elin, olivia, reese, jay] = this.cast();
     this.things = [
       {
         x: 170, y: 300,
@@ -225,7 +230,7 @@ export default class TreehouseScene extends BaseLevel {
   }
 
   async runIntro() {
-    const [elin, olivia, reese, jay] = KIDS;
+    const [elin, olivia, reese, jay] = this.cast();
     await this.wait(700);
     await this.say(olivia, 'Welcome inside my treehouse!');
     await this.say(elin, 'WOW! It has lights, and a rug, and a TELESCOPE!');
@@ -258,7 +263,7 @@ export default class TreehouseScene extends BaseLevel {
   }
 
   async finale() {
-    const [elin, olivia, reese, jay] = KIDS;
+    const [elin, olivia, reese, jay] = this.cast();
     await this.say(olivia, 'So... do you like my treehouse?');
     await this.say(elin, 'We LOVE it!');
     await this.say(jay, 'Ooh! Can this be our SuperKids HEADQUARTERS?');

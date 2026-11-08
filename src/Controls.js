@@ -103,9 +103,9 @@ export default class Controls {
     return p && this.enabled;
   }
 
-  setSpecialLabel(text, ready) {
+  setSpecialLabel(text, ready, color = 0x00bcd4) {
     this.specialText.setText(text);
-    this.special.setFillStyle(ready ? 0x00bcd4 : 0x546e7a, 0.6);
+    this.special.setFillStyle(ready ? color : 0x546e7a, 0.6);
   }
 
   get attackHeld() {

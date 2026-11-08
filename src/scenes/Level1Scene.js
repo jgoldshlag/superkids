@@ -28,9 +28,7 @@ export default class Level1Scene extends BossLevel {
     this.addBlocker(520, 418, 100, 30);
     this.man = this.add.image(520, 392, 'char-man').setDepth(400);
 
-    this.kids = KIDS.map((def, i) => new Kid(this, 760 + i * 70, 1010, def, def.id === 'elin'));
-    this.elin = this.kids[0];
-    this.bots = this.kids.slice(1);
+    this.createKids(760, 1010);
     this.boss = this.pigeon = new Pigeon(this, 640, 500, new Phaser.Geom.Rectangle(130, 330, WORLD_W - 260, WORLD_H - 450), this.diff);
     this.setupFight({ bossName: 'GIANT PIGEON', shortName: 'pigeon', foodTexture: 'bread' });
 
@@ -215,7 +213,7 @@ export default class Level1Scene extends BossLevel {
     this.kids.forEach((k, i) => this.tweens.add({ targets: k.sprite, y: 860, duration: 900, delay: i * 100 }));
     await this.wait(1300);
 
-    const [elin, olivia, reese, jay] = KIDS;
+    const [elin, olivia, reese, jay] = this.cast();
     await this.say(elin, 'Whoa! That pigeon is GIANT!');
     await this.say(reese, "It's going to eat all the bread in Arlington!");
     await this.say(jay, "Not if we stop it first! We'll help you, Elin!");
@@ -258,7 +256,7 @@ export default class Level1Scene extends BossLevel {
     sfx('coo');
     await this.wait(800);
 
-    const [elin, olivia, reese, jay] = KIDS;
+    const [elin, olivia, reese, jay] = this.cast();
     await this.say(elin, 'We did it! The pigeon is little again!');
     await this.say(MAN, "Oh my! I'm so sorry. Maybe pigeons should only get a LITTLE bread.");
     await this.say(reese, 'Good idea, mister!');

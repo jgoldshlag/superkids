@@ -33,9 +33,7 @@ export default class Level8Scene extends BossLevel {
     this.drawBedroom();
     this.drawHospital();
 
-    this.kids = KIDS.map((def, i) => new Kid(this, 790 + i * 70, 1100, def, def.id === 'elin'));
-    this.elin = this.kids[0];
-    this.bots = this.kids.slice(1);
+    this.createKids(790, 1100);
     this.boss = this.monster = new DreamMonster(this, 900, 500, new Phaser.Geom.Rectangle(220, 380, DREAM.w - 440, DREAM.h - 560), this.diff);
     this.setupFight({ bossName: 'THE BAD DREAM', shortName: 'Bad Dream', foodTexture: 'teddy' });
 
@@ -148,7 +146,7 @@ export default class Level8Scene extends BossLevel {
     for (const [fx, fy, c] of [[310, 205, 0xff80ab], [330, 200, 0xffeb3b], [320, 190, 0xce93d8]]) g.fillStyle(c, 1).fillCircle(x + fx, y + fy, 9);
     this.doctor = this.add.image(x + 690, y + 360, 'char-doctor').setDepth(400);
     // Elin lying in the hospital bed
-    this.bedElin = this.add.image(this.hospBedSpot.x, this.hospBedSpot.y + 20, 'char-elin').setDepth(305).setVisible(false);
+    this.bedElin = this.add.image(this.hospBedSpot.x, this.hospBedSpot.y + 20, `char-${this.heroId()}`).setDepth(305).setVisible(false);
   }
 
   // Put the kids in the dream and lock the camera there.
@@ -250,8 +248,8 @@ export default class Level8Scene extends BossLevel {
 
   async runIntro() {
     const cam = this.cameras.main;
-    const [elin, olivia, reese, jay] = KIDS;
-    const [eK, oK, rK, jK] = this.kids;
+    const [elin, olivia, reese, jay] = this.cast();
+    const [eK, oK, rK, jK] = this.castKids();
     this.controls.setEnabled(false);
     this.monster.sprite.setVisible(false);
     music.play('explore');
@@ -283,16 +281,16 @@ export default class Level8Scene extends BossLevel {
     cam.shake(400, 0.01);
     eK.sprite.setTint(0xb388ff);
     await this.wait(400);
-    await this.dialog.show('Elin...?', 'Must... give... everyone... BAD DREAMS...', 'char-elin', '#b388ff');
-    await this.say(olivia, "Elin?! Her eyes are glowing purple! The Bad Dream took over Elin!");
+    await this.dialog.show(`${this.heroDef.name}...?`, 'Must... give... everyone... BAD DREAMS...', `char-${this.heroId()}`, '#b388ff');
+    await this.say(olivia, "Elin?! Your eyes are glowing purple! The Bad Dream took over Elin!");
     // she falls fast asleep in her bed
     eK.sprite.clearTint();
     this.showKid(eK, false);
-    this.add.image(this.bedSpot.x, this.bedSpot.y, 'char-elin').setDepth(300);
+    this.add.image(this.bedSpot.x, this.bedSpot.y, `char-${this.heroId()}`).setDepth(300);
     this.add.rectangle(ROOM.x + 165, ROOM.y + 255, 150, 160, 0x9b5de5).setOrigin(0).setDepth(301);
     this.popText(this.bedSpot.x + 40, this.bedSpot.y - 40, 'Zzz...', 0xb388ff, 28);
     await this.wait(500);
-    await this.say(reese, "She fell asleep and she won't wake up! We have to get help!");
+    await this.say(reese, "Elin fell asleep and won't wake up! We have to get help!");
     sfx('siren');
     await this.wait(1800);
 
@@ -304,12 +302,23 @@ export default class Level8Scene extends BossLevel {
       this.bedElin.setVisible(true).setAngle(0);
       [oK, rK, jK].forEach((k, i) => k.sprite.setPosition(HOSP.x + 300 + i * 90, HOSP.y + 520));
     });
-    await this.say(KIDS[1], "Look, it's Dr. Nana! She's Elin's GRANDMA!");
-    await this.doctorSays("Hi, kids. Don't worry - I'm taking extra good care of my granddaughter.");
-    await this.doctorSays("She's in a very deep sleep. She's stuck inside a bad dream.");
-    await this.say(jay, 'Is there anything we can do to help her?');
-    await this.say(olivia, "Her Tech Watch! It knows every tech code in the world... even the code to go INTO a dream!");
-    await this.say(reese, "Then let's go in there and help her! Beep... boop... ENTER DREAM!");
+    const heroIsElin = this.heroId() === 'elin';
+    if (heroIsElin) {
+      await this.say(KIDS[1], "Look, it's Dr. Nana! She's {Elin}'s GRANDMA!");
+      await this.doctorSays("Hi, kids. Don't worry - I'm taking extra good care of my granddaughter.");
+    } else {
+      await this.say(KIDS[0], "Look, it's my Nana! She's a doctor here!");
+      await this.doctorSays("Hi, sweetie. Hi, kids. Don't worry - I'm taking extra good care of Elin.");
+    }
+    await this.doctorSays('Elin is in a very deep sleep... stuck inside a bad dream.');
+    await this.say(jay, 'Is there anything we can do to help Elin?');
+    if (heroIsElin) {
+      await this.say(olivia, "{Elin}'s Tech Watch! It knows every tech code in the world... even the code to go INTO a dream!");
+      await this.say(reese, "Then let's go in there and help! Beep... boop... ENTER DREAM!");
+    } else {
+      await this.say(KIDS[0], "My Tech Watch knows every tech code in the world... even the code to go INTO a dream!");
+      await this.say(KIDS[0], "Let's go in there and help Elin! Beep... boop... ENTER DREAM!");
+    }
     sfx('twinkle');
     cam.flash(800, 255, 255, 255);
     await this.wait(800);
@@ -356,7 +365,7 @@ export default class Level8Scene extends BossLevel {
     this.stopAction();
     this.bossBar.setVisible(false);
     const m = this.monster;
-    const [elin, olivia, reese, jay] = KIDS;
+    const [elin, olivia, reese, jay] = this.cast();
     music.stop();
     sfx('bonk');
     this.popText(m.x, m.y - 100, 'NOOO! Not the GOOD feelings!', 0xb388ff, 28);
@@ -375,7 +384,7 @@ export default class Level8Scene extends BossLevel {
     await this.wait(700);
 
     // --- 4. Back at the hospital: Elin wakes up! ---
-    const [eK, oK, rK, jK] = this.kids;
+    const [eK, oK, rK, jK] = this.castKids();
     await this.fade(() => {
       this.physics.world.setBounds(0, 0, WORLD_W, WORLD_H);
       this.cameras.main.stopFollow();
@@ -392,8 +401,13 @@ export default class Level8Scene extends BossLevel {
     sfx('happy');
     await this.say(elin, '*yawn* ...Hi guys! I had the CRAZIEST dream... and you were all in it!');
     await this.say(olivia, 'ELIN! You woke up!');
-    await this.say(elin, 'NANA! You were here the whole time!');
-    await this.doctorSays("Of course, sweetie. Grandmas always stay close. And look at that - you're all better!");
+    if (this.heroId() === 'elin') {
+      await this.say(elin, 'NANA! You were here the whole time!');
+      await this.doctorSays("Of course, sweetie. Grandmas always stay close. And look at that - you're all better!");
+    } else {
+      await this.say(elin, 'Dr. Nana! Thank you for taking care of me!');
+      await this.doctorSays("Of course, sweetie. And look at that - you're all better!");
+    }
     await this.doctorSays('You can go home today. Big hugs first!');
     music.play('win');
     this.bedElin.setVisible(false);
@@ -406,7 +420,7 @@ export default class Level8Scene extends BossLevel {
       level: 8,
       replay: 'Level8',
       next: 'Level9',
-      subtitle: 'Elin is all better - good dreams only!',
+      subtitle: `${this.heroDef.name} is all better - good dreams only!`,
       stats: `${this.diff.label}     Teddy bears saved: ${this.foodCollected}     Time: ${formatTime(elapsed)}`,
     });
   }
