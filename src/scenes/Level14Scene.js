@@ -117,9 +117,10 @@ export default class Level14Scene extends BaseLevel {
     this.addBlocker(960, 175, 200, 90);
 
     // LIVING ROOM: couch, TV, coffee table with a board game
-    g.fillStyle(0x263238, 1).fillRect(250, 590, 300, 30); // TV
-    this.tv = this.add.rectangle(400, 605, 290, 22, 0x37474f).setDepth(2);
-    this.addBlocker(400, 605, 300, 40);
+    // the TV is on the playroom wall (not blocking any doors!)
+    g.fillStyle(0x263238, 1).fillRect(830, 572, 300, 30);
+    this.tv = this.add.rectangle(980, 575, 290, 22, 0x37474f).setOrigin(0.5, 0).setDepth(2);
+    this.addBlocker(980, 590, 300, 40);
     g.fillStyle(0x5c6bc0, 1).fillRoundedRect(220, 1000, 360, 90, 20); // couch
     g.fillStyle(0x7986cb, 1).fillRoundedRect(240, 1010, 320, 50, 14);
     this.addBlocker(400, 1045, 360, 90);
@@ -321,24 +322,24 @@ export default class Level14Scene extends BaseLevel {
     // everybody sits on the couch
     const cam = this.cameras.main;
     cam.stopFollow();
-    cam.pan(400, 800, 800, 'Sine.easeInOut');
-    this.kids.forEach((k, i) => this.tweens.add({ targets: k.sprite, x: 250 + i * 75, y: 960, duration: 900 }));
+    cam.pan(980, 740, 800, 'Sine.easeInOut');
+    this.kids.forEach((k, i) => this.tweens.add({ targets: k.sprite, x: 830 + i * 75, y: 800, duration: 900 }));
     await this.wait(1000);
     // SuperKids... on the TV! (the game they're IN)
     this.tv.setFillStyle(0x1b1f3a);
-    this.tweens.add({ targets: this.tv, scaleY: 6, y: 660, duration: 400 });
+    this.tweens.add({ targets: this.tv, scaleY: 6, duration: 400 });
     await this.wait(450);
-    const title = this.add.text(400, 625, 'SuperKids', { fontFamily: 'Arial Black, Arial', fontSize: '22px', color: '#ffd23f', stroke: '#d7263d', strokeThickness: 4 }).setOrigin(0.5).setDepth(3);
-    const tiny = ['char-elin', 'char-olivia', 'char-reese', 'char-jay'].map((t, i) => this.add.image(330 + i * 30, 680, t).setScale(0.45).setDepth(3));
-    const pig = this.add.image(500, 672, 'pigeon').setScale(0.4).setDepth(3);
+    const title = this.add.text(980, 600, 'SuperKids', { fontFamily: 'Arial Black, Arial', fontSize: '22px', color: '#ffd23f', stroke: '#d7263d', strokeThickness: 4 }).setOrigin(0.5).setDepth(3);
+    const tiny = ['char-elin', 'char-olivia', 'char-reese', 'char-jay'].map((t, i) => this.add.image(910 + i * 30, 690, t).setScale(0.45).setDepth(3));
+    const pig = this.add.image(1080, 682, 'pigeon').setScale(0.4).setDepth(3);
     music.play('hero');
     sfx('fight');
-    tiny.forEach((t, i) => this.tweens.add({ targets: t, y: 670, duration: 200, yoyo: true, repeat: 8, delay: i * 80 }));
-    this.tweens.add({ targets: pig, x: 470, duration: 400, yoyo: true, repeat: 4 });
+    tiny.forEach((t, i) => this.tweens.add({ targets: t, y: 680, duration: 200, yoyo: true, repeat: 8, delay: i * 80 }));
+    this.tweens.add({ targets: pig, x: 1050, duration: 400, yoyo: true, repeat: 4 });
     for (let i = 0; i < 8; i++) {
       this.time.delayedCall(i * 300, () => {
         sfx('punch');
-        this.popText(Phaser.Math.Between(320, 480), 650, Phaser.Utils.Array.GetRandom(['POW!', 'ZAP!', 'BAM!']), 0xffd23f, 18);
+        this.popText(Phaser.Math.Between(900, 1060), 640, Phaser.Utils.Array.GetRandom(['POW!', 'ZAP!', 'BAM!']), 0xffd23f, 18);
       });
     }
     await this.wait(1200);
