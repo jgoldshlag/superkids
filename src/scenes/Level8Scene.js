@@ -22,6 +22,7 @@ export default class Level8Scene extends BossLevel {
   }
 
   create() {
+    this.addExitButton();
     createArt(this);
     createLevel678Art(this);
     this.physics.world.setBounds(0, 0, WORLD_W, WORLD_H);
@@ -75,7 +76,7 @@ export default class Level8Scene extends BossLevel {
     top.fillStyle(0xffffff, 1).fillCircle(760, 130, 60);
     top.lineStyle(5, 0x4a148c, 1).strokeCircle(760, 130, 60).lineBetween(760, 130, 790, 165).lineBetween(760, 130, 740, 90);
     this.add
-      .text(900, 40, "ELIN'S DREAM", { fontFamily: 'Arial Black, Arial', fontSize: '32px', color: '#d1c4e9', stroke: '#311b92', strokeThickness: 6 })
+      .text(900, 40, `${this.heroDef.name.toUpperCase()}'S DREAM`, { fontFamily: 'Arial Black, Arial', fontSize: '32px', color: '#d1c4e9', stroke: '#311b92', strokeThickness: 6 })
       .setOrigin(0.5)
       .setDepth(261);
     this.addBlocker(DREAM.w / 2, 130, DREAM.w, 260);
@@ -106,10 +107,12 @@ export default class Level8Scene extends BossLevel {
     // bed
     g.fillStyle(0x6d4c41, 1).fillRect(x + 160, y + 180, 160, 240);
     g.fillStyle(0xffffff, 1).fillRoundedRect(x + 175, y + 190, 130, 50, 10);
-    g.fillStyle(0x9b5de5, 1).fillRect(x + 165, y + 260, 150, 155);
+    const cape = this.heroDef.cape; // the bed matches the hero's costume
+    g.fillStyle(cape, 1).fillRect(x + 165, y + 260, 150, 155);
     this.bedSpot = { x: x + 240, y: y + 230 };
     // sleeping bags for the friends
-    for (const [bx, c] of [[460, 0xf15bb5], [580, 0x00a6ed], [700, 0x2ec46d]]) {
+    const friends = this.cast().slice(1).map((d) => d.cape);
+    for (const [bx, c] of [[460, friends[0]], [580, friends[1]], [700, friends[2]]]) {
       g.fillStyle(c, 1).fillRoundedRect(x + bx, y + 380, 80, 170, 30);
     }
     // night light
@@ -124,12 +127,29 @@ export default class Level8Scene extends BossLevel {
     for (let yy = 0; yy < 768; yy += 64) {
       for (let xx = 0; xx < 1024; xx += 64) g.fillStyle((xx + yy) % 128 ? 0xe3f2fd : 0xffffff, 1).fillRect(x + xx, y + yy, 64, 64);
     }
-    g.fillStyle(0xb2dfdb, 1).fillRect(x, y, 1024, 170);
+    // every hero gets their own hospital room
+    const theme = {
+      elin: { wall: 0xe1d5f5, room: 101, decor: 'stars' },
+      olivia: { wall: 0xfce4ec, room: 102, decor: 'snow' },
+      reese: { wall: 0xe1f5fe, room: 103, decor: 'flames' },
+      jay: { wall: 0xe8f5e9, room: 104, decor: 'eggs' },
+    }[this.heroId()];
+    g.fillStyle(theme.wall, 1).fillRect(x, y, 1024, 170);
+    this.drawRoomDecor(g, x, y, theme.decor);
+    this.add
+      .text(x + 920, y + 140, `ROOM ${theme.room}`, { fontFamily: 'Arial Black, Arial', fontSize: '18px', color: '#37474f' })
+      .setOrigin(0.5)
+      .setDepth(1);
+    // balloons in the hero's color
+    for (const [bx, by] of [[x + 380, y + 230], [x + 400, y + 215], [x + 362, y + 212]]) {
+      g.lineStyle(1.5, 0x777777, 1).lineBetween(bx, by + 18, x + 380, y + 300);
+      g.fillStyle(this.heroDef.cape, 1).fillEllipse(bx, by, 26, 32);
+    }
     g.fillStyle(0x81d4fa, 1).fillRect(x + 100, y + 30, 180, 100);
     g.lineStyle(6, 0xffffff, 1).strokeRect(x + 100, y + 30, 180, 100);
     g.fillStyle(0xffeb3b, 1).fillCircle(x + 240, y + 60, 18); // sunshine
     this.add
-      .text(x + 700, y + 60, 'ARLINGTON HOSPITAL', { fontFamily: 'Arial Black, Arial', fontSize: '26px', color: '#00796b' })
+      .text(x + 790, y + 60, 'ARLINGTON HOSPITAL', { fontFamily: 'Arial Black, Arial', fontSize: '26px', color: '#00796b' })
       .setOrigin(0.5)
       .setDepth(1);
     // heart monitor
@@ -140,13 +160,52 @@ export default class Level8Scene extends BossLevel {
     g.fillStyle(0xb0bec5, 1).fillRect(x + 430, y + 190, 180, 280);
     g.fillStyle(0xffffff, 1).fillRoundedRect(x + 445, y + 200, 150, 60, 10);
     this.hospBedSpot = { x: x + 520, y: y + 250 };
-    this.blanket = this.add.rectangle(x + 435, y + 290, 170, 170, 0x80cbc4).setOrigin(0).setDepth(310);
+    this.blanket = this.add.rectangle(x + 435, y + 290, 170, 170, this.heroDef.cape).setOrigin(0).setDepth(310);
     // flowers
     g.fillStyle(0x795548, 1).fillRect(x + 300, y + 220, 40, 40);
     for (const [fx, fy, c] of [[310, 205, 0xff80ab], [330, 200, 0xffeb3b], [320, 190, 0xce93d8]]) g.fillStyle(c, 1).fillCircle(x + fx, y + fy, 9);
     this.doctor = this.add.image(x + 690, y + 360, 'char-doctor').setDepth(400);
     // Elin lying in the hospital bed
     this.bedElin = this.add.image(this.hospBedSpot.x, this.hospBedSpot.y + 20, `char-${this.heroId()}`).setDepth(305).setVisible(false);
+  }
+
+  // A poster on the hospital wall that matches the hero.
+  drawRoomDecor(g, x, y, decor) {
+    const px = x + 360;
+    const py = y + 30;
+    g.fillStyle(0xffffff, 1).fillRoundedRect(px, py, 200, 110, 8);
+    g.lineStyle(4, this.heroDef.cape, 1).strokeRoundedRect(px, py, 200, 110, 8);
+    if (decor === 'stars') {
+      // Elin: stars and a tech watch
+      for (const [sx, sy] of [[30, 25], [70, 70], [150, 30], [170, 85], [110, 55]]) this.add.image(px + sx, py + sy, 'star').setScale(1.6).setDepth(1);
+      g.fillStyle(0x263238, 1).fillRoundedRect(px + 90, py + 25, 40, 40, 8);
+      g.fillStyle(0x00e5ff, 1).fillRoundedRect(px + 95, py + 30, 30, 30, 6);
+    } else if (decor === 'snow') {
+      // Olivia: snowflakes and an ice trident
+      g.lineStyle(3, 0x4fc3f7, 1);
+      for (const [sx, sy] of [[35, 30], [160, 35], [45, 82], [165, 80]]) {
+        for (let i = 0; i < 3; i++) {
+          const a = (i * Math.PI) / 3;
+          g.lineBetween(px + sx - Math.cos(a) * 12, py + sy - Math.sin(a) * 12, px + sx + Math.cos(a) * 12, py + sy + Math.sin(a) * 12);
+        }
+      }
+      g.lineStyle(4, 0xd4a017, 1).lineBetween(px + 100, py + 100, px + 100, py + 30);
+      g.lineStyle(4, 0x8fe3ff, 1).lineBetween(px + 86, py + 30, px + 114, py + 30).lineBetween(px + 86, py + 30, px + 86, py + 14).lineBetween(px + 100, py + 30, px + 100, py + 10).lineBetween(px + 114, py + 30, px + 114, py + 14);
+    } else if (decor === 'flames') {
+      // Reese: fireballs and a sword
+      for (const fx of [30, 60, 140, 170]) {
+        g.fillStyle(0xff7043, 1).fillTriangle(px + fx - 14, py + 95, px + fx + 14, py + 95, px + fx, py + 55);
+        g.fillStyle(0xffd54f, 1).fillTriangle(px + fx - 7, py + 95, px + fx + 7, py + 95, px + fx, py + 72);
+      }
+      g.fillStyle(0xd9e2ec, 1).fillTriangle(px + 94, py + 80, px + 106, py + 80, px + 100, py + 12);
+      g.fillStyle(0x8d6e63, 1).fillRect(px + 88, py + 80, 24, 6).fillRect(px + 96, py + 86, 8, 16);
+    } else {
+      // Jay: eggs and a baby chick
+      for (const [ex, ey] of [[35, 40], [165, 40], [40, 82], [160, 82]]) g.fillStyle(0xfffaf0, 1).fillEllipse(px + ex, py + ey, 22, 28).lineStyle(2, 0xd7ccc8, 1).strokeEllipse(px + ex, py + ey, 22, 28);
+      g.fillStyle(0xffeb3b, 1).fillCircle(px + 100, py + 62, 24).fillCircle(px + 100, py + 36, 15);
+      g.fillStyle(0x222222, 1).fillCircle(px + 95, py + 33, 2.5).fillCircle(px + 105, py + 33, 2.5);
+      g.fillStyle(0xff9800, 1).fillTriangle(px + 96, py + 39, px + 104, py + 39, px + 100, py + 46);
+    }
   }
 
   // Put the kids in the dream and lock the camera there.
@@ -287,7 +346,7 @@ export default class Level8Scene extends BossLevel {
     eK.sprite.clearTint();
     this.showKid(eK, false);
     this.add.image(this.bedSpot.x, this.bedSpot.y, `char-${this.heroId()}`).setDepth(300);
-    this.add.rectangle(ROOM.x + 165, ROOM.y + 255, 150, 160, 0x9b5de5).setOrigin(0).setDepth(301);
+    this.add.rectangle(ROOM.x + 165, ROOM.y + 255, 150, 160, this.heroDef.cape).setOrigin(0).setDepth(301);
     this.popText(this.bedSpot.x + 40, this.bedSpot.y - 40, 'Zzz...', 0xb388ff, 28);
     await this.wait(500);
     await this.say(reese, "Elin fell asleep and won't wake up! We have to get help!");
@@ -314,12 +373,13 @@ export default class Level8Scene extends BossLevel {
     await this.say(jay, 'Is there anything we can do to help Elin?');
     if (heroIsElin) {
       await this.say(olivia, "{Elin}'s Tech Watch! It knows every tech code in the world... even the code to go INTO a dream!");
-      await this.say(reese, "Then let's go in there and help! Beep... boop... ENTER DREAM!");
+      await this.say(reese, "Then let's go in there and help! Beep... boop... ENTER DREAM... INITIATED!");
     } else {
       await this.say(KIDS[0], "My Tech Watch knows every tech code in the world... even the code to go INTO a dream!");
-      await this.say(KIDS[0], "Let's go in there and help Elin! Beep... boop... ENTER DREAM!");
+      await this.say(KIDS[0], "Let's go in there and help Elin! Beep... boop... ENTER DREAM... INITIATED!");
     }
     sfx('twinkle');
+    this.popText(HOSP.x + 512, HOSP.y + 300, 'ENTER DREAM... INITIATED!', 0x00e5ff, 44);
     cam.flash(800, 255, 255, 255);
     await this.wait(800);
 

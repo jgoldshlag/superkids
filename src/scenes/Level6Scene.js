@@ -18,6 +18,7 @@ export default class Level6Scene extends BossLevel {
   }
 
   create() {
+    this.addExitButton();
     createArt(this);
     createLevel678Art(this);
     this.physics.world.setBounds(0, 0, WORLD_W, WORLD_H);

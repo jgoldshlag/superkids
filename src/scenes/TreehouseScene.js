@@ -29,6 +29,7 @@ export default class TreehouseScene extends BaseLevel {
   }
 
   create() {
+    this.addExitButton();
     createArt(this);
     createLevel2Art(this);
     this.cameras.main.fadeIn(600, 0, 0, 0);

@@ -9,5 +9,5 @@ export const LEVELS = [
   { name: 'The Heart Boss', scene: 'Level7' },
   { name: 'The Bad Dream', scene: 'Level8' },
   { name: 'The Zombie', scene: 'Level9' },
-  { name: '?' },
+  { name: 'The Everything Boss', scene: 'Level10' },
 ];

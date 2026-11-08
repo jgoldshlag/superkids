@@ -33,7 +33,13 @@ export default class BaseLevel extends Phaser.Scene {
   swapNames(text) {
     const h = this.heroDef.name;
     let t = text.replace(/\{Elin\}/g, '\u0001');
-    if (h !== 'Elin') t = t.replace(new RegExp(`\\b(Elin|${h})\\b`, 'g'), (m) => (m === 'Elin' ? h : 'Elin'));
+    if (h !== 'Elin') {
+      // works for "Elin" and for SHOUTING "ELIN!" too
+      t = t.replace(new RegExp(`\\b(Elin|${h})\\b`, 'gi'), (m) => {
+        const other = m.toLowerCase() === 'elin' ? h : 'Elin';
+        return m === m.toUpperCase() ? other.toUpperCase() : other;
+      });
+    }
     return t.replace(/\u0001/g, 'Elin');
   }
 
@@ -71,6 +77,23 @@ export default class BaseLevel extends Phaser.Scene {
     this.physics.add.existing(z, true);
     this.obstacles.add(z);
     return z;
+  }
+
+  // Red X in the top-right corner (or ESC): leave the level and go back home.
+  addExitButton() {
+    const { width: W } = this.scale;
+    const btn = this.add.circle(W - 34, 34, 24, 0xd7263d).setStrokeStyle(3, 0xffffff).setScrollFactor(0).setDepth(25000);
+    this.add
+      .text(W - 34, 34, 'X', { fontFamily: 'Arial Black, Arial', fontSize: '24px', color: '#ffffff' })
+      .setOrigin(0.5)
+      .setScrollFactor(0)
+      .setDepth(25001);
+    const home = () => this.scene.start('Title');
+    btn.setInteractive({ useHandCursor: true }).on('pointerdown', (p, lx, ly, ev) => {
+      ev?.stopPropagation();
+      home();
+    });
+    this.input.keyboard?.on('keydown-ESC', home);
   }
 
   levelComplete(data) {

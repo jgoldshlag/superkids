@@ -58,7 +58,7 @@ export default class LevelSelectScene extends Phaser.Scene {
     makeButton(this, W / 2, 700, 'Back', () => this.scene.start('Title'), 0x6c757d);
     this.input.keyboard?.on('keydown', (e) => {
       const n = parseInt(e.key, 10);
-      const lvl = LEVELS[n - 1];
+      const lvl = LEVELS[n === 0 ? 9 : n - 1]; // key 0 = level 10
       if (lvl?.scene && this.scene.manager.keys[lvl.scene]) this.scene.start(lvl.scene);
     });
   }

@@ -33,6 +33,7 @@ export default class Level2Scene extends BaseLevel {
   }
 
   create() {
+    this.addExitButton();
     createArt(this);
     createLevel2Art(this);
     this.physics.world.setBounds(0, 0, W, H);

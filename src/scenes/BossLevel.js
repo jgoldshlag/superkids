@@ -62,9 +62,9 @@ export default class BossLevel extends BaseLevel {
       .text(16, 54, this.diff.label, { fontFamily: 'Arial Black, Arial', fontSize: '16px', color: colorHex(this.diff.color), stroke: '#000', strokeThickness: 4 })
       .setScrollFactor(0)
       .setDepth(9500);
-    this.add.image(W - 95, 30, foodTexture).setScale(1.4).setScrollFactor(0).setDepth(9500);
+    this.add.image(W - 150, 30, foodTexture).setScale(1.4).setScrollFactor(0).setDepth(9500);
     this.foodText = this.add
-      .text(W - 72, 30, 'x 0', { fontFamily: 'Arial Black, Arial', fontSize: '24px', color: '#ffffff', stroke: '#000', strokeThickness: 4 })
+      .text(W - 127, 30, 'x 0', { fontFamily: 'Arial Black, Arial', fontSize: '24px', color: '#ffffff', stroke: '#000', strokeThickness: 4 })
       .setOrigin(0, 0.5)
       .setScrollFactor(0)
       .setDepth(9500);

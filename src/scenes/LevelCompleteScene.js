@@ -57,8 +57,15 @@ export default class LevelCompleteScene extends Phaser.Scene {
     } else {
       makeButton(this, W / 2 - 170, 580, 'Play Again', () => this.scene.start(data.replay));
       makeButton(this, W / 2 + 170, 580, 'Pick Level', () => this.scene.start('LevelSelect'), 0x4c6ef5);
+      const last = data.level >= 10;
       this.add
-        .text(W / 2, 680, `Level ${data.level + 1} coming soon!`, { fontFamily: 'Arial', fontSize: '24px', color: '#ffffff' })
+        .text(W / 2, 680, last ? 'YOU BEAT THE WHOLE GAME! The SuperKids saved Arlington!' : `Level ${data.level + 1} coming soon!`, {
+          fontFamily: last ? 'Arial Black, Arial' : 'Arial',
+          fontSize: last ? '28px' : '24px',
+          color: last ? '#ffd23f' : '#ffffff',
+          stroke: '#000',
+          strokeThickness: last ? 5 : 0,
+        })
         .setOrigin(0.5);
     }
   }

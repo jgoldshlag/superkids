@@ -21,6 +21,7 @@ export default class Level3Scene extends BossLevel {
   }
 
   create() {
+    this.addExitButton();
     createArt(this);
     createLevel3Art(this);
     this.physics.world.setBounds(0, 0, WORLD_W, WORLD_H);
