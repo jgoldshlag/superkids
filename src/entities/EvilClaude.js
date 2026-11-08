@@ -6,7 +6,7 @@ import { sfx } from '../audio/sound.js';
 // Attacks: ink blasts, computer viruses, tentacle slams, and GLITCH (teleports next to you and charges).
 export default class EvilClaude extends BaseBoss {
   constructor(scene, x, y, bounds, diff) {
-    super(scene, x, y, bounds, diff, 'evilclaude', { size: 1.6, radiusBase: 34, shadowY: 46, shadowScale: 0.8 });
+    super(scene, x, y, bounds, diff, 'evilclaude', { size: 1.4, radiusBase: 28, shadowY: 26, shadowScale: 0.7 });
     this.dangerStates = ['virusWindup', 'appear', 'telegraph', 'dash'];
     this.noPushStates = ['vanish', 'appear', 'telegraph', 'dash'];
     this.bobAmount = 3;
@@ -17,7 +17,7 @@ export default class EvilClaude extends BaseBoss {
   // Computer cookies make him stronger.
   eat() {
     this.hp = Math.min(this.maxHp, this.hp + this.diff.breadHeal);
-    this.growTo(Math.min(this.size * 1.05, 2.2), this.chub, 400);
+    this.growTo(Math.min(this.size * 1.05, 1.9), this.chub, 400);
   }
 
   chooseAttack() {

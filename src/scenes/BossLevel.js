@@ -138,8 +138,8 @@ export default class BossLevel extends BaseLevel {
       if (!gone && b.alive && Phaser.Math.Distance.Between(s.x, s.y, b.x, b.y) < b.radius + (s.big ? 30 : 10)) {
         const w = s.kid.def.weapon;
         b.damage(s.damage, s.kid);
-        this.popText(s.x, s.y - 20, Phaser.Utils.Array.GetRandom(w.words), s.kid.def.cape, 24);
-        if (w.effect === 'freeze') this.bossSlowUntil = time + 2000;
+        this.popText(s.x, s.y - 20, Phaser.Utils.Array.GetRandom(s.words ?? w.words), s.kid.def.cape, 24);
+        if (w.effect === 'freeze' || s.slow) this.bossSlowUntil = time + 2000;
         if (w.shot === 'egg') {
           sfx('splat');
           const sp = this.add.image(s.x, s.y, 'splat').setDepth(8601);

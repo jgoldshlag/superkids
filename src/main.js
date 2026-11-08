@@ -14,6 +14,7 @@ import Level8Scene from './scenes/Level8Scene.js';
 import Level9Scene from './scenes/Level9Scene.js';
 import Level10Scene from './scenes/Level10Scene.js';
 import Level11Scene from './scenes/Level11Scene.js';
+import Level12Scene from './scenes/Level12Scene.js';
 
 const config = {
   type: Phaser.AUTO,
@@ -30,7 +31,7 @@ const config = {
     default: 'arcade',
     arcade: { gravity: { x: 0, y: 0 }, debug: false },
   },
-  scene: [TitleScene, LevelSelectScene, Level1Scene, Level2Scene, TreehouseScene, Level3Scene, Level4Scene, Level5Scene, Level6Scene, Level7Scene, Level8Scene, Level9Scene, Level10Scene, Level11Scene, LevelCompleteScene],
+  scene: [TitleScene, LevelSelectScene, Level1Scene, Level2Scene, TreehouseScene, Level3Scene, Level4Scene, Level5Scene, Level6Scene, Level7Scene, Level8Scene, Level9Scene, Level10Scene, Level11Scene, Level12Scene, LevelCompleteScene],
 };
 
 window.__game = new Phaser.Game(config);

@@ -6,69 +6,86 @@ function gfx(scene) {
   return scene.make.graphics({ x: 0, y: 0 }, false);
 }
 
-// An octopus, front view, 96x100.
-function drawOctopus(g, { body, dark, hat, hatBand, evil = false, mean = true }) {
-  // 8 tentacles
-  g.lineStyle(9, body, 1);
-  const legs = [
-    [24, 62, 6, 84, 14, 96],
-    [32, 66, 20, 90, 30, 98],
-    [40, 68, 36, 92, 44, 98],
-    [46, 68, 46, 94, 40, 99],
-    [50, 68, 50, 94, 56, 99],
-    [56, 68, 60, 92, 52, 98],
-    [64, 66, 76, 90, 66, 98],
-    [72, 62, 90, 84, 82, 96],
-  ];
-  for (const [x1, y1, x2, y2, x3, y3] of legs) {
-    g.beginPath();
-    g.moveTo(x1, y1);
-    g.lineTo(x2, y2);
-    g.lineTo(x3, y3);
-    g.strokePath();
-  }
-  // suction cups
-  g.fillStyle(evil ? 0x7b1fa2 : 0xffd0a8, 1);
-  for (const [x, y] of [[12, 86], [24, 90], [38, 90], [58, 90], [72, 90], [84, 86]]) g.fillCircle(x, y, 2);
-  // big round head
-  g.fillStyle(body, 1).fillEllipse(48, 48, 66, 58);
-  if (evil) {
-    // black stripes on the dark purple head
-    g.fillStyle(0x0d0d0d, 1).fillEllipse(48, 30, 50, 10).fillEllipse(48, 70, 56, 8);
-  }
-  g.fillStyle(0xffffff, evil ? 0.12 : 0.25).fillEllipse(34, 36, 16, 10);
-  if (evil) {
-    // one mean eye + an EYE PATCH
-    g.fillStyle(0xffffff, 1).fillCircle(59, 50, 9);
-    g.fillStyle(0xd50000, 1).fillCircle(58, 51, 5);
-    g.fillStyle(0x000000, 1).fillCircle(58, 51, 2.5);
-    if (mean) g.lineStyle(3, 0x000000, 1).lineBetween(50, 40, 66, 44); // angry brow
-    else g.fillStyle(0xff8a80, 0.6).fillCircle(68, 60, 4); // happy cheek
-    g.lineStyle(2.5, 0x000000, 1).lineBetween(18, 34, 78, 40); // patch strap
-    g.fillStyle(0x000000, 1).fillEllipse(37, 50, 20, 18);
-    // sneaky grin
-    g.lineStyle(2.5, 0x000000, 1);
-    g.beginPath();
-    g.arc(48, 54, 9, 0.2 * Math.PI, 0.8 * Math.PI, false);
-    g.strokePath();
-    g.fillStyle(0xffffff, 1).fillTriangle(44, 62, 48, 62, 46, 66);
-  } else {
-    g.fillStyle(0xffffff, 1).fillCircle(37, 50, 9).fillCircle(59, 50, 9);
-    g.fillStyle(0x1a1a1a, 1).fillCircle(38, 51, 5).fillCircle(58, 51, 5);
-    g.fillStyle(0xffffff, 1).fillCircle(40, 49, 1.8).fillCircle(60, 49, 1.8);
-    g.fillStyle(0xff8a80, 0.6).fillCircle(28, 60, 4).fillCircle(68, 60, 4);
-    g.lineStyle(2.5, dark, 1);
-    g.beginPath();
-    g.arc(48, 58, 7, 0.15 * Math.PI, 0.85 * Math.PI, false);
-    g.strokePath();
-  }
-  // the triangle hat (plain - not a birthday hat!)
-  g.fillStyle(hat, 1).fillTriangle(30, 26, 66, 26, 48, 0);
-  g.fillStyle(hatBand, 1).fillRect(28, 22, 40, 6);
+// Pixel-art octopuses (Elin asked for pixels!). 16x16 pixels each.
+// . = empty, B = body, L = shine, H = hat, h = hat band, W = eye white, K = black, C = cheek,
+// S = black stripe, P = eye patch, R = red eye
+const OCTO = {
+  claude: [
+    '......HHHH......',
+    '.....HHHHHH.....',
+    '....HHHHHHHH....',
+    '...hhhhhhhhhh...',
+    '...BBBBBBBBBB...',
+    '..BBLLBBBBBBBB..',
+    '..BBWWBBBBWWBB..',
+    '..BBWKBBBBWKBB..',
+    '..BCBBBBBBBBCB..',
+    '..BBBKBBBBKBBB..',
+    '..BBBBKKKKBBBB..',
+    '..BBBBBBBBBBBB..',
+    '.BB.BB.BB.BB.BB.',
+    '.B..B..BB..B..B.',
+    'B..B..B..B..B..B',
+    '................',
+  ],
+  evil: [
+    '......HHHH......',
+    '.....HHHHHH.....',
+    '....HHHHHHHH....',
+    '...hhhhhhhhhh...',
+    '...SSSSSSSSSS...',
+    '..BPPBBBBBKKBB..',
+    '..BPPBBBBBWWBB..',
+    '..BPPBBBBBWRBB..',
+    '..BBBBBBBBBBBB..',
+    '..SSSSSSSSSSSS..',
+    '..BBBKKKKKKBBB..',
+    '..BBBBBWBBBBBB..',
+    '.BB.BB.BB.BB.BB.',
+    '.S..B..SS..B..S.',
+    'B..S..B..B..S..B',
+    '................',
+  ],
+  evilNice: [
+    '......HHHH......',
+    '.....HHHHHH.....',
+    '....HHHHHHHH....',
+    '...hhhhhhhhhh...',
+    '...SSSSSSSSSS...',
+    '..BPPBBBBBBBBB..',
+    '..BPPBBBBBWWBB..',
+    '..BPPBBBBBWKBB..',
+    '..BBBBBBBBBBCB..',
+    '..SSSKSSSSKSSS..',
+    '..BBBBKKKKBBBB..',
+    '..BBBBBBBBBBBB..',
+    '.BB.BB.BB.BB.BB.',
+    '.S..B..SS..B..S.',
+    'B..S..B..B..S..B',
+    '................',
+  ],
+};
+const OCTO_COLORS = {
+  claude: { B: 0xf28c38, L: 0xffb47a, H: 0xe65100, h: 0xbf360c, W: 0xffffff, K: 0x1a1a1a, C: 0xff8a80 },
+  evil: { B: 0x3b0a57, S: 0x0d0d0d, H: 0x1e88e5, h: 0x0d47a1, P: 0x000000, W: 0xffffff, R: 0xd50000, K: 0x000000, C: 0xff8a80 },
+};
+
+// Draws one pixel octopus. px = size of each pixel; (ox, oy) = top-left corner.
+export function drawPixelOctopus(g, kind, px = 4, ox = 0, oy = 0) {
+  const rows = OCTO[kind];
+  const colors = OCTO_COLORS[kind === 'claude' ? 'claude' : 'evil'];
+  rows.forEach((row, y) => {
+    [...row].forEach((ch, x) => {
+      if (ch === '.') return;
+      g.fillStyle(colors[ch], 1).fillRect(ox + x * px, oy + y * px, px, px);
+    });
+  });
 }
 
-const CLAUDE = { body: 0xf28c38, dark: 0xc96a1e, hat: 0x3949ab, hatBand: 0x283593 };
-const EVIL = { body: 0x3b0a57, dark: 0x1a0326, hat: 0x111111, hatBand: 0x6a1b9a, evil: true };
+// Keep pixel art sharp when it is scaled up.
+export function crisp(scene, ...keys) {
+  for (const k of keys) scene.textures.get(k).setFilter(1); // 1 = NEAREST
+}
 
 export function createLevel11Art(scene) {
   if (scene.textures.exists('claude')) return;
@@ -78,12 +95,11 @@ export function createLevel11Art(scene) {
     g.generateTexture(key, w, h);
     g.destroy();
   };
-  make('claude', 96, 100, (g) => drawOctopus(g, CLAUDE));
-  make('evilclaude', 96, 100, (g) => drawOctopus(g, EVIL));
-  // a nicer brother at the end: same colors, smiling, eye patch still on
-  make('evilclaude-nice', 96, 100, (g) => {
-    drawOctopus(g, { ...EVIL, mean: false });
-  });
+  make('claude', 64, 64, (g) => drawPixelOctopus(g, 'claude'));
+  make('evilclaude', 64, 64, (g) => drawPixelOctopus(g, 'evil'));
+  // a nicer brother at the end: smiling, eye patch still on
+  make('evilclaude-nice', 64, 64, (g) => drawPixelOctopus(g, 'evilNice'));
+  crisp(scene, 'claude', 'evilclaude', 'evilclaude-nice');
 
   // the cage Claude is stuck in
   make('cage', 130, 140, (g) => {
