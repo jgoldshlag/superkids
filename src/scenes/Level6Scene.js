@@ -28,7 +28,7 @@ export default class Level6Scene extends BossLevel {
     this.drawClassroom();
 
     this.createKids(690, 1080);
-    this.boss = this.robot = new Robot(this, BENCH.x, BENCH.y, new Phaser.Geom.Rectangle(220, 360, WORLD_W - 440, WORLD_H - 520), this.diff);
+    this.boss = this.robot = new Robot(this, BENCH.x, BENCH.y + 100, new Phaser.Geom.Rectangle(220, 360, WORLD_W - 440, WORLD_H - 520), this.diff);
     this.setupFight({ bossName: 'SUPER ROBOT 3000', shortName: 'robot', foodTexture: 'battery' });
 
     music.play('explore');
@@ -147,7 +147,7 @@ export default class Level6Scene extends BossLevel {
     const r = this.robot;
     const [elin, olivia, reese, jay] = this.cast();
     const jayKid = this.castKids()[3];
-    cam.centerOn(800, 700);
+    cam.centerOn(800, 640);
     this.controls.setEnabled(false);
     r.sprite.setTint(0x777777); // turned off
     r.size = 1.1;
@@ -226,7 +226,7 @@ export default class Level6Scene extends BossLevel {
     this.popText(r.x, r.y - 100, 'FRIEND MODE ON!', 0x39ff14, 36);
     await this.wait(600);
 
-    await this.robotSays('BEEP BOOP! Hello, friends! Would you like... a HIGH FIVE?');
+    await this.robotSays('BEEP BOOP! Hello, friends! Would you like... a HIGH FIVE?', true);
     await this.say(jay, "High five! ...And sorry I pushed the button.");
     this.tweens.add({ targets: this.teacher, x: BENCH.x - 220, y: 380, duration: 800 });
     await this.wait(800);
@@ -235,7 +235,7 @@ export default class Level6Scene extends BossLevel {
     await this.say(olivia, 'Can Super Robot 3000 come to the next class too?');
     this.kids.forEach((k, i) => this.tweens.add({ targets: k.sprite, y: k.y - 30, duration: 220, yoyo: true, repeat: 3, delay: i * 90 }));
     this.tweens.add({ targets: r, lift: 25, duration: 220, yoyo: true, repeat: 3 });
-    await this.robotSays('BEEP! (That means YES.)');
+    await this.robotSays('BEEP! (That means YES.)', true);
     await this.wait(400);
     this.levelComplete({
       level: 6,

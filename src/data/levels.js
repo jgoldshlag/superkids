@@ -13,7 +13,7 @@ export const LEVELS = [
   { name: 'Save Claude!', scene: 'Level11' },
   { name: 'Saturday: Calculator Box', scene: 'Level12' },
   { name: 'Sunday: Storm Twins', scene: 'Level13' },
-  { name: '?' },
+  { name: "Play Date at Elin's", scene: 'Level14' },
   { name: '?' },
   { name: '?' },
   { name: '?' },
