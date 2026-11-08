@@ -1,6 +1,8 @@
 import Phaser from 'phaser';
 import { createArt } from '../art.js';
+import { createLevel2Art } from '../art2.js';
 import { createLevel678Art } from '../art678.js';
+import { KIDS } from '../data/characters.js';
 import { createLevel12Art } from '../art12.js';
 import { createLevel13Art } from '../art13.js';
 import { LightningBoss, ThunderBoss } from '../entities/StormTwins.js';
@@ -22,6 +24,7 @@ export default class Level13Scene extends WeekendLevel {
   create() {
     this.addExitButton();
     createArt(this);
+    createLevel2Art(this);
     createLevel678Art(this);
     createLevel12Art(this);
     createLevel13Art(this);
@@ -283,12 +286,28 @@ export default class Level13Scene extends WeekendLevel {
     this.kids.forEach((k, i) => this.tweens.add({ targets: k.sprite, y: k.y - 30, duration: 220, yoyo: true, repeat: 3, delay: i * 90 }));
     this.tweens.add({ targets: [t, l], lift: 30, duration: 220, yoyo: true, repeat: 3 });
     await this.say(f2, "I can't wait to tell Elin about our weekend!");
-    await this.wait(600);
+
+    // Elin comes back! She saw the rainbow.
+    const elin = KIDS[0];
+    const car = this.add.image(PARK.w + 150, 660, 'car-1').setScale(1.4).setDepth(900);
+    sfx('toss');
+    await new Promise((res) => this.tweens.add({ targets: car, x: 1300, duration: 1500, ease: 'Quad.easeOut', onComplete: res }));
+    const elinNpc = this.add.image(1300, 700, 'char-elin').setDepth(840);
+    sfx('happy');
+    await new Promise((res) => this.tweens.add({ targets: elinNpc, x: 1170, y: 760, duration: 600, onComplete: res }));
+    await this.say(elin, "Hi, everybody! I saw a GIANT RAINBOW all the way from Rhode Island, so I came back!");
+    await this.say(f1, 'ELIN! You missed it! We beat the Calculator Box, Lightning Bolt AND Thunder!');
+    await this.say(hero, 'Here is your Tech Watch back. Thanks for letting us borrow it!');
+    await this.say(elin, 'You used my watch to save Arlington? You guys are the BEST!');
+    await this.claudeSays('Welcome back, Elin! The SuperKids are all together again!');
+    this.kids.forEach((k, i) => this.tweens.add({ targets: k.sprite, y: k.y - 30, duration: 220, yoyo: true, repeat: 3, delay: i * 90 }));
+    this.tweens.add({ targets: elinNpc, y: elinNpc.y - 30, duration: 220, yoyo: true, repeat: 3 });
+    await this.wait(1200);
     this.levelComplete({
       level: 13,
       replay: 'Level13',
       next: 'Level14',
-      subtitle: 'You beat BOTH storm twins!',
+      subtitle: 'You beat BOTH storm twins, and Elin is back!',
       stats: `${this.diff.label}     Batteries grabbed: ${this.foodCollected}     Time: ${formatTime(elapsed)}`,
     });
   }
